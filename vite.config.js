@@ -19,7 +19,7 @@ export default defineConfig({
                 target: "http://localhost:8080",
                 changeOrigin: true,
                 //第一个参数为正则表达式
-                rewrite: url => url.replace(/^\/api/, "/api/v1")
+                // rewrite: url => url.replace(/^\/api/, "/api/v1")
             }
         }
     },
