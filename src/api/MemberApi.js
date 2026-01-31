@@ -12,4 +12,12 @@ function findAll(pageNo, pageSize, params) {
     });
 }
 
-export {findAll}
+function deleteByIds(ids) {
+    return api({
+        url: "/member",
+        method: "delete",
+        params: {ids}
+    })
+}
+
+export {findAll, deleteByIds}

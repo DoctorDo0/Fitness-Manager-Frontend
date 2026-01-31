@@ -51,21 +51,21 @@
 
   <!-- 按钮区 -->
   <div class="action">
-    <el-button type="primary" :icon="CirclePlus">新增</el-button>
-    <el-button type="primary" :icon="Edit">修改</el-button>
+    <el-button type="primary" :icon="CirclePlus" @click="addInfo">新增</el-button>
+    <el-button type="primary" :icon="Edit" @click="editById">修改</el-button>
     <el-button type="primary" :icon="Search" @click="doSearch">查询</el-button>
     <el-button type="primary" :icon="Refresh" @click="resetForm">重置</el-button>
-    <el-button type="danger" :icon="Delete">删除</el-button>
+    <el-button type="danger" :icon="Delete" @click="doDelete">删除</el-button>
   </div>
 
   <!-- 数据区 -->
   <div class="grid">
     <!--简写形式 v-bind:可简写为: v-on:可简写为@-->
     <el-table class="tbl" v-bind:data="members" stripe border v-on:row-click="tableRowClick" height="500" ref="tbl">
-      <el-table-column type="selection" align="center"/>
-      <el-table-column prop="id" label="ID" width="80"/>
-      <el-table-column prop="memberId" label="会员ID" width="100"/>
-      <el-table-column prop="name" label="姓名" width="140"/>
+      <el-table-column type="selection" align="center" fixed/>
+      <el-table-column prop="id" label="ID" width="80" fixed/>
+      <el-table-column prop="memberId" label="会员ID" width="100" fixed/>
+      <el-table-column prop="name" label="姓名" width="140" fixed/>
       <el-table-column prop="gender" label="性别" width="60" align="center"/>
       <el-table-column prop="phone" label="手机号" width="160"/>
       <el-table-column prop="email" label="邮箱" width="160"/>
@@ -74,6 +74,12 @@
       <el-table-column prop="updateDate" label="最后更新日期" width="160" align="center"/>
       <el-table-column prop="updateBy" label="更新操作人" width="120" align="center"/>
       <el-table-column prop="balance" label="资金" width="120" align="center"/>
+      <el-table-column width="150" label="操作">
+        <template #default="scope">
+          <el-button type="primary" size="small">编辑</el-button>
+          <el-button type="danger" size="small">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
   </div>
@@ -104,8 +110,9 @@
 
 <script setup>
 import {ref, onMounted, reactive, toRaw} from "vue";
-import {findAll} from "@/api/MemberApi.js";
+import {findAll, deleteByIds as apiDelByIds} from "@/api/MemberApi.js";
 import {CirclePlus, Delete, Edit, Refresh, Search} from "@element-plus/icons-vue";
+import {ElMessage, ElMessageBox} from "element-plus";
 
 //表格数据
 const members = ref();
@@ -158,6 +165,44 @@ const formRef = ref();
 //重置按钮功能
 function resetForm() {
   formRef.value.resetFields();//重置表单
+}
+
+//页面删除逻辑
+function doDelete() {
+  //获取选中行
+  let rows = tbl.value.getSelectionRows();
+  let ids = rows.map(t => t.id);
+  if (ids.length === 0) {
+    ElMessage.error("未选择要删除的行");
+    return;
+  }
+
+  ElMessageBox.confirm("是否确认删除选中的行?", "警告", {
+    type: "warning"
+  }).then(() => {
+    //点击ok操作
+    deleteByIds(ids);
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
+}
+
+//删除传递功能
+async function deleteByIds(ids) {
+  let resp = await apiDelByIds(ids);
+  ElMessage.success("删除操作成功，共删除" + resp.data + "条记录");
+  doSearch();
+}
+
+//新增功能
+function addInfo() {
+  console.log("addInfo");
+}
+
+//编辑功能
+function editById() {
+  console.log("editById");
 }
 
 //表格对象
