@@ -19,16 +19,34 @@
         </el-select>
       </el-form-item>
 
+      <el-form-item label="出生日期:" prop="birthdayRange">
+        <el-date-picker v-model="searchModel.birthdayRange"
+                        type="daterange"
+                        format="YYYY-MM-DD"
+                        value-format="YYYY-MM-DD"
+                        range-separator="~"
+                        start-placeholder="起始"
+                        end-placeholder="结束"
+        />
+      </el-form-item>
+
       <el-form-item label="手机号:" prop="phone">
         <el-input v-model="searchModel.phone" placeholder="输入手机号"/>
       </el-form-item>
 
-      <el-form-item label="邮箱:" prop="email">
-        <el-input v-model="searchModel.email" placeholder="输入邮箱"/>
-      </el-form-item>
-
       <el-form-item label="注册日期:" prop="registerDateRange">
         <el-date-picker v-model="searchModel.registerDateRange"
+                        type="daterange"
+                        format="YYYY-MM-DD"
+                        value-format="YYYY-MM-DD"
+                        range-separator="~"
+                        start-placeholder="起始"
+                        end-placeholder="结束"
+        />
+      </el-form-item>
+
+      <el-form-item label="修改日期:" prop="updateDateRange">
+        <el-date-picker v-model="searchModel.updateDateRange"
                         type="daterange"
                         format="YYYY-MM-DD"
                         value-format="YYYY-MM-DD"
@@ -67,8 +85,11 @@
       <el-table-column prop="memberId" label="会员ID" width="100" fixed/>
       <el-table-column prop="name" label="姓名" width="140" fixed/>
       <el-table-column prop="gender" label="性别" width="60" align="center"/>
+      <el-table-column prop="birthday" label="出生日期" width="120" align="center"/>
       <el-table-column prop="phone" label="手机号" width="160"/>
       <el-table-column prop="email" label="邮箱" width="160"/>
+      <el-table-column prop="wechat" label="微信号" width="160"/>
+      <el-table-column prop="qq" label="QQ号" width="160"/>
       <el-table-column prop="registerDate" label="注册起始日期" width="160" align="center"/>
       <el-table-column prop="registerBy" label="注册操作人" width="120" align="center"/>
       <el-table-column prop="updateDate" label="最后更新日期" width="160" align="center"/>
@@ -103,18 +124,21 @@
     <el-form label-width="90" label-position="right">
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="账号：">
+
+          <el-form-item label="会员ID：">
             <el-input v-model="memberModel.username" placeholder="请输入账号"/>
           </el-form-item>
           <el-form-item label="密码：">
             <el-input type="password" v-model="memberModel.password" show-password placeholder="请输入密码"/>
           </el-form-item>
-          <el-form-item label="手机号：">
-            <el-input type="tel" v-model="memberModel.phone" placeholder="请输入手机号"/>
+          <el-form-item label="姓名：">
+            <el-input v-model="memberModel.name" placeholder="请输入姓名"/>
           </el-form-item>
-          <el-form-item label="微信号：">
-            <el-input v-model="memberModel.wechat" placeholder="请输入微信号"/>
+          <el-form-item label="出生日期：">
+            <el-date-picker v-model="memberModel.birthday" type="date" placeholder="请选择出生日期"
+                            style="width: 100%"/>
           </el-form-item>
+
         </el-col>
 
         <el-col :span="12">
@@ -132,19 +156,7 @@
       </el-row>
 
       <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="姓名：">
-            <el-input v-model="memberModel.name" placeholder="请输入姓名"/>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="拼音：">
-            <el-input v-model="memberModel.pinyin" placeholder="请输入拼音"/>
-          </el-form-item>
-        </el-col>
-      </el-row>
 
-      <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="性别：">
             <el-radio-group v-model="memberModel.sex">
@@ -153,18 +165,31 @@
             </el-radio-group>
           </el-form-item>
         </el-col>
+
         <el-col :span="12">
-          <el-form-item label="出生日期：">
-            <el-date-picker v-model="memberModel.birthday" type="date" placeholder="请选择出生日期"
-                            style="width: 100%"/>
+          <el-form-item label="手机号：">
+            <el-input type="tel" v-model="memberModel.phone" placeholder="请输入手机号"/>
           </el-form-item>
         </el-col>
       </el-row>
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="邮箱：">
-            <el-input type="email" v-model="memberModel.email" placeholder="请输入邮箱"/>
+          <el-form-item label="邮箱号：">
+            <el-input v-model="memberModel.email" placeholder="请输入邮箱号"/>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="微信号：">
+            <el-input v-model="memberModel.wechat" placeholder="请输入微信号"/>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="QQ号：">
+            <el-input v-model="memberModel.qq" placeholder="请输入QQ号"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -224,8 +249,8 @@ let searchModel = ref({
   memberId: null,
   name: null,
   gender: null,
+  birthdayRange: [],
   phone: null,
-  email: null,
   registerDateRange: [],
   registerBy: null,
   updateDateRange: [],
@@ -291,15 +316,15 @@ const showDlg = ref(false);
 const dlgTitle = ref();
 //新增表单数据模型
 const memberModel = ref({
-  username: null,
-  password: null,
+  memberId: null,
+  memberPassword: null,
   name: null,
-  pinyin: null,
-  sex: "男",
+  gender: "男",
   birthday: null,
   phone: null,
-  wechat: null,
   email: null,
+  wechat: null,
+  qq: null,
   description: null,
   avatar: null
 });
