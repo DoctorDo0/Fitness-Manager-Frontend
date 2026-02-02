@@ -16,7 +16,7 @@ function deleteByIds(ids) {
     return api({
         url: "/member",
         method: "delete",
-        params: {ids}
+        data: ids
     })
 }
 
