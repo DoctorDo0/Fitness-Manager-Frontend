@@ -80,5 +80,10 @@ button:focus-visible {
 }
 */
 body {
-    padding: 8px;
+    padding: 0;
+    margin: 0;
+}
+
+html, body, #app {
+    height: 100%;
 }

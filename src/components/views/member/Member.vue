@@ -121,7 +121,7 @@
   <!--新增或修改的窗口-->
   <el-dialog v-model="showDlg" :title="dlgTitle" width="700"
              :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg">
-    <el-form label-width="90" label-position="right" :model="memberModel" ref="memberFormRef">
+    <el-form label-width="90" label-position="right" :model="memberModel" ref="memberFormRef" :rules="rules">
       <el-row :gutter="20">
         <el-col :span="12">
 
@@ -360,16 +360,31 @@ const memberModel = ref({
   avatar: null
 });
 
+function setInitialFormData() {
+  // memberModel.value = cloneDeep(memberModel.value);
+  memberModel.value.memberId = null;
+  memberModel.value.memberPassword = null;
+  memberModel.value.name = null;
+  memberModel.value.gender = "男";
+  memberModel.value.birthday = null;
+  memberModel.value.phone = null;
+  memberModel.value.email = null;
+  memberModel.value.wechat = null;
+  memberModel.value.qq = null;
+  memberModel.value.description = null;
+  memberModel.value.avatar = null;
+}
+
 //新增/修改表单对象
 const memberFormRef = ref();
 
 //校验规则
 const rules = {
-  username: [
+  memberId: [
     {required: true, message: "会员账号不可为空", trigger: "blur"},
     {min: 6, max: 12, message: "账号必须介于6~12位", trigger: "blur"}
   ],
-  password: [
+  memberPassword: [
     {validator: validateFormPass, trigger: "blur"}
   ],
   name: [
@@ -486,6 +501,9 @@ function doSubmit() {
 //关闭对话框时触发
 function closeDlg() {
   memberFormRef.value.resetFields();
+  //TODO:
+  mode = "add";//bug fixed: 用于修复，当在任意情况下，点击编辑后，再次点击新增按钮，账号ID状态未刷新，导致无法选中编辑bug
+  setInitialFormData();//bug fixed: 用于修复，当第一次进入界面后，先点击编辑后，再点击新增，导致新增界面回显为第一次点击编辑的数据的bug
 }
 
 //表格对象
