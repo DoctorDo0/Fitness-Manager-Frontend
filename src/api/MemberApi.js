@@ -20,4 +20,20 @@ function deleteByIds(ids) {
     })
 }
 
-export {findAll, deleteByIds}
+function save(member) {
+    return api({
+        url: "/member",
+        method: "post",
+        data: member
+    });
+}
+
+function update(member) {
+    return api({
+        url: "/member",
+        method: "put",
+        data: member
+    });
+}
+
+export {findAll, deleteByIds, save, update}

@@ -12,14 +12,14 @@
       </el-form-item>
 
       <el-form-item label="性别:" prop="gender">
-        <el-select v-model="searchModel.gender" :empty-values="[null]" :value-on-clear="null" style="width: 160px">
+        <el-select v-model="searchModel.gender" :empty-values="[null]" :value-on-clear="null" style="width: 120px">
           <el-option label="不限" value=""/>
           <el-option label="男" value="男"/>
           <el-option label="女" value="女"/>
         </el-select>
       </el-form-item>
 
-      <el-form-item label="出生日期:" prop="birthdayRange">
+      <el-form-item label="出生日期:" prop="birthdayRange" style="width: 360px">
         <el-date-picker v-model="searchModel.birthdayRange"
                         type="daterange"
                         format="YYYY-MM-DD"
@@ -34,7 +34,7 @@
         <el-input v-model="searchModel.phone" placeholder="输入手机号"/>
       </el-form-item>
 
-      <el-form-item label="注册日期:" prop="registerDateRange">
+      <el-form-item label="注册日期:" prop="registerDateRange" style="width: 360px">
         <el-date-picker v-model="searchModel.registerDateRange"
                         type="daterange"
                         format="YYYY-MM-DD"
@@ -45,7 +45,7 @@
         />
       </el-form-item>
 
-      <el-form-item label="修改日期:" prop="updateDateRange">
+      <el-form-item label="修改日期:" prop="updateDateRange" style="width: 360px">
         <el-date-picker v-model="searchModel.updateDateRange"
                         type="daterange"
                         format="YYYY-MM-DD"
@@ -70,7 +70,7 @@
   <!-- 按钮区 -->
   <div class="action">
     <el-button type="primary" :icon="CirclePlus" @click="doAdd">新增</el-button>
-    <el-button type="primary" :icon="Edit" @click="editById">修改</el-button>
+    <el-button type="primary" :icon="Edit" @click="doEdit">修改</el-button>
     <el-button type="primary" :icon="Search" @click="doSearch">查询</el-button>
     <el-button type="primary" :icon="Refresh" @click="resetForm">重置</el-button>
     <el-button type="danger" :icon="Delete" @click="doDelete">删除</el-button>
@@ -120,21 +120,22 @@
 
   <!--新增或修改的窗口-->
   <el-dialog v-model="showDlg" :title="dlgTitle" width="700"
-             :close-on-click-modal="false" draggable overflow>
-    <el-form label-width="90" label-position="right">
+             :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg">
+    <el-form label-width="90" label-position="right" :model="memberModel" ref="memberFormRef">
       <el-row :gutter="20">
         <el-col :span="12">
 
-          <el-form-item label="会员ID：">
-            <el-input v-model="memberModel.username" placeholder="请输入账号"/>
+          <el-form-item label="会员ID：" prop="memberId">
+            <el-input v-model="memberModel.memberId" placeholder="请输入账号" :readonly="mode==='edit'"
+                      :disabled="mode==='edit'"/>
           </el-form-item>
-          <el-form-item label="密码：">
-            <el-input type="password" v-model="memberModel.password" show-password placeholder="请输入密码"/>
+          <el-form-item label="密码：" prop="memberPassword">
+            <el-input type="password" v-model="memberModel.memberPassword" show-password placeholder="请输入密码"/>
           </el-form-item>
-          <el-form-item label="姓名：">
+          <el-form-item label="姓名：" prop="name">
             <el-input v-model="memberModel.name" placeholder="请输入姓名"/>
           </el-form-item>
-          <el-form-item label="出生日期：">
+          <el-form-item label="出生日期：" prop="birthday">
             <el-date-picker v-model="memberModel.birthday" type="date" placeholder="请选择出生日期"
                             style="width: 100%"/>
           </el-form-item>
@@ -142,7 +143,7 @@
         </el-col>
 
         <el-col :span="12">
-          <el-form-item label="头像：">
+          <el-form-item label="头像：" prop="avatar">
             <!-- 上传表单 -->
             <el-upload class="avatar-uploader">
               <div class="avatar"></div>
@@ -158,8 +159,8 @@
       <el-row :gutter="20">
 
         <el-col :span="12">
-          <el-form-item label="性别：">
-            <el-radio-group v-model="memberModel.sex">
+          <el-form-item label="性别：" prop="gender">
+            <el-radio-group v-model="memberModel.gender">
               <el-radio value="男">男</el-radio>
               <el-radio value="女">女</el-radio>
             </el-radio-group>
@@ -167,7 +168,7 @@
         </el-col>
 
         <el-col :span="12">
-          <el-form-item label="手机号：">
+          <el-form-item label="手机号：" prop="phone">
             <el-input type="tel" v-model="memberModel.phone" placeholder="请输入手机号"/>
           </el-form-item>
         </el-col>
@@ -175,12 +176,12 @@
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="邮箱号：">
+          <el-form-item label="邮箱号：" prop="email">
             <el-input v-model="memberModel.email" placeholder="请输入邮箱号"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="微信号：">
+          <el-form-item label="微信号：" prop="wechat">
             <el-input v-model="memberModel.wechat" placeholder="请输入微信号"/>
           </el-form-item>
         </el-col>
@@ -188,7 +189,7 @@
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="QQ号：">
+          <el-form-item label="QQ号：" prop="qq">
             <el-input v-model="memberModel.qq" placeholder="请输入QQ号"/>
           </el-form-item>
         </el-col>
@@ -196,7 +197,7 @@
 
       <el-row :gutter="20">
         <el-col :span="24">
-          <el-form-item label="备注：">
+          <el-form-item label="备注：" prop="description">
             <el-input type="textarea" v-model="memberModel.description" placeholder="请输入备注"
                       input-style="height:100px"/>
           </el-form-item>
@@ -205,7 +206,7 @@
     </el-form>
     <template #footer>
       <div>
-        <el-button type="primary">确定</el-button>
+        <el-button type="primary" @click="doSubmit">确定</el-button>
         <el-button @click="showDlg=false">取消</el-button>
       </div>
     </template>
@@ -221,13 +222,41 @@
 .pagination {
   margin-top: 10px;
 }
+
+.grid {
+  margin-top: 10px;
+}
+
+.avatar {
+  width: 175px;
+  height: 175px;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+}
+
+.avatar-uploader {
+  position: relative;
+  height: 175px; /*影响高度，进一步影响头像icon位置*/
+}
+
+.avatar-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -15px;
+  margin-left: -15px;
+  display: block;
+  font-size: 30px;
+}
 </style>
 
 <script setup>
-import {ref, onMounted, reactive, toRaw} from "vue";
-import {findAll, deleteByIds as apiDelByIds} from "@/api/MemberApi.js";
+import {ref, onMounted, reactive, toRaw, nextTick} from "vue";
+import {findAll, deleteByIds as apiDelByIds, save, update} from "@/api/MemberApi.js";
 import {CirclePlus, Delete, Edit, Plus, Refresh, Search} from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from "element-plus";
+//深度克隆
+import {cloneDeep} from "lodash";
 
 //表格数据
 const members = ref();
@@ -310,6 +339,8 @@ async function deleteByIds(ids) {
   doSearch();
 }
 
+//操作模式
+let mode = "view";//add:新增，edit:修改
 //是否显示对话框
 const showDlg = ref(false);
 //对话框标题
@@ -329,15 +360,132 @@ const memberModel = ref({
   avatar: null
 });
 
+//新增/修改表单对象
+const memberFormRef = ref();
+
+//校验规则
+const rules = {
+  username: [
+    {required: true, message: "会员账号不可为空", trigger: "blur"},
+    {min: 6, max: 12, message: "账号必须介于6~12位", trigger: "blur"}
+  ],
+  password: [
+    {validator: validateFormPass, trigger: "blur"}
+  ],
+  name: [
+    {required: true, message: "会员姓名不可为空", trigger: "blur"},
+    {min: 2, max: 20, message: "姓名必须介于2~20位", trigger: "blur"}
+  ],
+  gender: [
+    {validator: validateFormGender, trigger: "blur"}
+  ],
+  birthday: [
+    {type: "date", message: "出生日期格式不正确", trigger: "blur"}
+  ],
+  phone: [
+    {required: true, message: "会员手机号不可为空", trigger: "blur"},
+    {validator: validateFormPhone, trigger: "blur"}
+  ],
+  email: [
+    {type: "email", message: "邮箱格式不正确", trigger: "blur"}
+  ]
+};
+
+//性别校验
+function validateFormGender(rule, value, cb) {
+  if (value === "男" || value === "女") {
+    cb();
+  } else {
+    cb(new Error("性别只能是男或女"));
+  }
+}
+
+//手机号校验
+function validateFormPhone(rule, value, cb) {
+  if (value.match(/^\d{11}$/)) {
+    cb();//无错误
+  } else {
+    cb(new Error("手机号必须是11位数字格式"));
+  }
+}
+
+//密码校验
+function validateFormPass(rule, value, cb) {
+  if (value == null || value.trim() === "") {//空
+    if (mode === "add") {
+      cb(new Error("密码不可为空"));
+    } else {
+      cb();
+    }
+  } else {
+    if (value.length < 6 || value.length > 12) {
+      cb(new Error("密码必须介于6~12位之间"));
+    } else {
+      cb();
+    }
+  }
+}
+
 //新增功能
 function doAdd() {
+  mode = "add";
   showDlg.value = true;
   dlgTitle.value = "新增会员";
 }
 
 //编辑功能
-function editById() {
-  console.log("editById");
+function doEdit() {
+  let rows = tbl.value.getSelectionRows();//获取所有选中行
+  if (rows.length === 0) {
+    ElMessage.warning("请选中您要修改的行");
+  } else if (rows.length > 1) {
+    ElMessage.error("您一次只能修改一行");
+  } else {
+    let row = toRaw(rows[0]);
+    //在下一个时间滴答内，执行操作
+    nextTick(() => {
+      mode = "edit";
+      row = cloneDeep(row);//克隆出的新对象没有响应式能力
+      row.password = null;
+
+      memberModel.value = row;
+      dlgTitle.value = "修改会员";
+      showDlg.value = true;
+    });
+  }
+}
+
+//提交会员表单
+function doSubmit() {
+  memberFormRef.value.validate(async valid => {
+    if (valid) {
+      let params = toRaw(memberModel.value);
+      if (mode === "add") {
+        let resp = await save(params);
+        if (resp.success) {
+          ElMessage.success("保存会员信息成功");
+          showDlg.value = false;
+          doSearch();
+        } else {
+          ElMessage.error(resp.msg || "保存会员信息失败");
+        }
+      } else if (mode === "edit") {
+        let resp = await update(params);
+        if (resp.success) {
+          ElMessage.success("修改会员信息成功");
+          showDlg.value = false;
+          doSearch();
+        } else {
+          ElMessage.error(resp.msg || "修改会员信息失败");
+        }
+      }
+    }
+  });
+}
+
+//关闭对话框时触发
+function closeDlg() {
+  memberFormRef.value.resetFields();
 }
 
 //表格对象
