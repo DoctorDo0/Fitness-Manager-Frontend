@@ -126,8 +126,8 @@
         <el-col :span="12">
 
           <el-form-item label="会员ID：" prop="memberId">
-            <el-input v-model="memberModel.memberId" placeholder="请输入账号" :readonly="mode==='edit'"
-                      :disabled="mode==='edit'"/>
+            <el-input v-model="memberModel.memberId" placeholder="请输入账号" :readonly="mode.valueOf() ==='edit'"
+                      :disabled="mode.valueOf() ==='edit'"/>
           </el-form-item>
           <el-form-item label="密码：" prop="memberPassword">
             <el-input type="password" v-model="memberModel.memberPassword" show-password placeholder="请输入密码"/>
@@ -340,7 +340,7 @@ async function deleteByIds(ids) {
 }
 
 //操作模式
-let mode = "view";//add:新增，edit:修改
+const mode = ref("view");//add:新增，edit:修改
 //是否显示对话框
 const showDlg = ref(false);
 //对话框标题
@@ -427,7 +427,7 @@ function validateFormPhone(rule, value, cb) {
 //密码校验
 function validateFormPass(rule, value, cb) {
   if (value == null || value.trim() === "") {//空
-    if (mode === "add") {
+    if (mode.value === "add") {
       cb(new Error("密码不可为空"));
     } else {
       cb();
@@ -443,7 +443,7 @@ function validateFormPass(rule, value, cb) {
 
 //新增功能
 function doAdd() {
-  mode = "add";
+  mode.value = "add";
   showDlg.value = true;
   dlgTitle.value = "新增会员";
 }
@@ -459,7 +459,7 @@ function doEdit() {
     let row = toRaw(rows[0]);
     //在下一个时间滴答内，执行操作
     nextTick(() => {
-      mode = "edit";
+      mode.value = "edit";
       row = cloneDeep(row);//克隆出的新对象没有响应式能力
       row.password = null;
 
@@ -475,7 +475,7 @@ function doSubmit() {
   memberFormRef.value.validate(async valid => {
     if (valid) {
       let params = toRaw(memberModel.value);
-      if (mode === "add") {
+      if (mode.value === "add") {
         let resp = await save(params);
         if (resp.success) {
           ElMessage.success("保存会员信息成功");
@@ -484,7 +484,7 @@ function doSubmit() {
         } else {
           ElMessage.error(resp.msg || "保存会员信息失败");
         }
-      } else if (mode === "edit") {
+      } else if (mode.value === "edit") {
         let resp = await update(params);
         if (resp.success) {
           ElMessage.success("修改会员信息成功");
@@ -502,7 +502,6 @@ function doSubmit() {
 function closeDlg() {
   memberFormRef.value.resetFields();
   //TODO:
-  mode = "add";//bug fixed: 用于修复，当在任意情况下，点击编辑后，再次点击新增按钮，账号ID状态未刷新，导致无法选中编辑bug
   setInitialFormData();//bug fixed: 用于修复，当第一次进入界面后，先点击编辑后，再点击新增，导致新增界面回显为第一次点击编辑的数据的bug
 }
 
