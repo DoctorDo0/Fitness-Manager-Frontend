@@ -1,7 +1,3 @@
-<script setup>
-import {Document, Location, Setting} from "@element-plus/icons-vue";
-</script>
-
 <template>
   <div style="height: 100%">
     <el-container style="height: 100%">
@@ -10,8 +6,8 @@ import {Document, Location, Setting} from "@element-plus/icons-vue";
       </el-header>
       <el-container class="con">
         <el-aside width="200px" class="aside">
-          <el-menu active-text-color="#ffd04b" background-color="#545c64" text-color="#fff">
-            <el-sub-menu index="1">
+          <el-menu active-text-color="#ffd04b" background-color="#545c64" text-color="#fff" router>
+            <!--<el-sub-menu index="1">
               <template #title>
                 <el-icon><location /></el-icon>
                 <span>基础数据</span>
@@ -42,12 +38,33 @@ import {Document, Location, Setting} from "@element-plus/icons-vue";
             <el-menu-item index="4">
               <el-icon><setting /></el-icon>
               <span>系统设置</span>
-            </el-menu-item>
+            </el-menu-item>-->
+            <template v-for="m1 in menus">
+              <el-sub-menu v-if="Array.isArray(m1.children)" :index="m1.name">
+                <template #title>
+                  <Component :is="m1.icon" v-if="m1.icon"/>
+                  <span>{{ m1.name }}</span>
+                </template>
+
+                <el-menu-item v-for="m2 in m1.children" :index="m2.url">
+                  <Component :is="m2.icon" v-if="m2.icon"/>
+                  <span>{{ m2.name }}</span>
+                </el-menu-item>
+              </el-sub-menu>
+
+              <!-- 叶子菜单 -->
+              <el-menu-item v-else :index="m1.url">
+                <Component :is="m1.icon" v-if="m1.icon"/>
+                <span>{{ m1.name }}</span>
+              </el-menu-item>
+            </template>
           </el-menu>
 
 
         </el-aside>
-        <el-main class="main"></el-main>
+        <el-main class="main">
+          <router-view></router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
@@ -61,7 +78,7 @@ import {Document, Location, Setting} from "@element-plus/icons-vue";
   position: relative;
 }
 
-.header>h1 {
+.header > h1 {
   margin: 0;
   font-weight: normal;
   font-size: 22px;
@@ -84,3 +101,7 @@ import {Document, Location, Setting} from "@element-plus/icons-vue";
   background-color: #fff;
 }
 </style>
+
+<script setup>
+import menus from "@/api/MenuApi.js";
+</script>

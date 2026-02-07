@@ -121,7 +121,7 @@
   <!--新增或修改的窗口-->
   <el-dialog v-model="showDlg" :title="dlgTitle" width="700"
              :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg">
-    <el-form label-width="90" label-position="right" :model="memberModel" ref="memberFormRef" :rules="rules">
+    <el-form label-width="90" label-position="right" :model="memberModel" ref="memberFormRef" >
       <el-row :gutter="20">
         <el-col :span="12">
 
@@ -482,7 +482,7 @@ function doSubmit() {
           showDlg.value = false;
           doSearch();
         } else {
-          ElMessage.error(resp.msg || "保存会员信息失败");
+          ElMessage.error(resp.message || "保存会员信息失败");
         }
       } else if (mode.value === "edit") {
         let resp = await update(params);
@@ -491,7 +491,7 @@ function doSubmit() {
           showDlg.value = false;
           doSearch();
         } else {
-          ElMessage.error(resp.msg || "修改会员信息失败");
+          ElMessage.error(resp.message || "修改会员信息失败");
         }
       }
     }
