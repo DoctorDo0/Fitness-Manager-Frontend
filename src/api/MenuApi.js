@@ -1,6 +1,7 @@
 const menus = [
     {
-        name: "基础数据"
+        name: "基础数据",
+        url: "/main/data"
     }, {
         name: "会馆管理",
         children: [{
@@ -29,15 +30,20 @@ const menus = [
         name: "营销管理",
         children: [
             {
-                name: "活动管理"
+                name: "活动管理",
+                url: "/main/activity"
             }, {
-                name: "户外推广"
+                name: "户外推广",
+                url: "/main/promotion"
             }
         ]
     }, {
         name: "系统设置",
         icon: "setting",
         url: "/setting"
+    }, {
+        name: "退出系统",
+        url: "/logout"
     }
 ];
 

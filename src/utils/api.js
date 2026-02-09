@@ -1,4 +1,5 @@
 import axios from "axios";
+import {getJwt, setJwt} from "@/api/JwtApi.js";
 
 const api = axios.create({
     baseURL: "/api",
@@ -7,8 +8,18 @@ const api = axios.create({
 
 //响应拦截器
 api.interceptors.response.use(
-    resp => resp.data,
+    resp => {
+        let jwt = resp.headers["x-auth-token"];
+        if (jwt) {
+            setJwt(jwt);
+        }
+        return resp.data;
+    },
     error => {
+        if (error.response.status === 401) {
+            location.href = "/login";
+            return false;
+        }
         return {
             code: 500,
             success: false,
@@ -16,5 +27,11 @@ api.interceptors.response.use(
         };
     }
 );
+
+//定义请求拦截器
+api.interceptors.request.use(config => {
+    config.headers["Authorization"] = getJwt();
+    return config;
+});
 
 export default api;

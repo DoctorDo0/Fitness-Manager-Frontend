@@ -1,4 +1,6 @@
 import {createRouter, createWebHistory} from "vue-router";
+import {getJwt, removeJwt} from "@/api/JwtApi.js";
+
 //路由
 const routes = [
     {
@@ -19,7 +21,7 @@ const routes = [
     }, {
         name: "index",
         path: "",
-        redirect: "/main",
+        redirect: "/main"
     }, {
         name: "login",
         path: "/login",
@@ -32,12 +34,42 @@ const routes = [
         name: "member",
         path: "/member",
         component: () => import("@/components/views/member/Member.vue")
+    }, {
+        name: "logout",
+        path: "/logout"
     }
 ];
+
 //创建路由转发器
 const router = createRouter({
     routes,
     history: createWebHistory()
 });
+
+//路由守卫
+router.beforeEach((to, from, next) => {
+    if (to.name === "logout") {
+        removeJwt();
+        next("/login");
+        return;
+    }
+
+    let jwt = getJwt();
+
+    if (jwt) {
+        if (to.name === "login") {
+            next("/main");
+        } else {
+            next();
+        }
+    } else {
+        if (to.name === "login") {
+            next();
+        } else {
+            next("/login");
+        }
+    }
+});
+
 //导出路由转发器
 export default router;

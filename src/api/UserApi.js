@@ -8,19 +8,4 @@ function login(params) {
     });
 }
 
-function logout(params) {
-    return api({
-        url: "/users/logout",
-        method: "post",
-        data: params
-    })
-}
-
-function getCaptcha() {
-    return api({
-        url: "/users/captcha",
-        method: "get"
-    })
-}
-
-export {login, logout, getCaptcha};
+export {login};

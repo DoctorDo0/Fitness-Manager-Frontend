@@ -115,14 +115,20 @@
 
 <script setup>
 import {ref, onMounted, toRaw} from "vue";
+import {setJwt} from "@/api/JwtApi.js";
 //用于生成随机id
 import {nanoid} from "nanoid";
 import {login} from "@/api/UserApi.js";
+import {ElMessage} from "element-plus";
+import {useRouter} from "vue-router";
+
+//获取路由转发器
+const router = useRouter();
 
 //登录表单
 const loginModel = ref({
-  username: null,
-  password: null,
+  username: "admin",
+  password: "123456",
   captcha: null
 });
 
@@ -132,7 +138,7 @@ const rules = {
     {
       required: true, message: "用户名不可为空", trigger: "blur"
     }, {
-      min: 6, max: 12, message: "用户名长度必须介于6~12之间", trigger: "blur"
+      min: 4, max: 12, message: "用户名长度必须介于4~12之间", trigger: "blur"
     }
   ],
   password: [
@@ -167,12 +173,20 @@ const loginFormRef = ref();
 //登录
 function submitLogin() {
   loginFormRef.value.validate(async valid => {
-    if(valid) {
+    if (valid) {
       let params = toRaw(loginModel.value);
       params.key = captchaKey.value;
       let resp = await login(params);
 
-      console.log(resp);
+      if (resp.success) {
+        let jwt = resp.data;
+        setJwt(jwt);//保存
+        //中转到/mian路由
+        router.push("/main");
+      } else {
+        ElMessage.error(resp.message || "登录验证失败");
+        newCapt();
+      }
     }
   });
 }
