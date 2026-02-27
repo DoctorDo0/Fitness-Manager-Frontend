@@ -1,5 +1,5 @@
 import axios from "axios";
-import {getJwt, setJwt} from "@/api/JwtApi.js";
+import {getJwt, removeJwt, setJwt} from "@/api/JwtApi.js";
 
 const api = axios.create({
     baseURL: "/api",
@@ -17,6 +17,7 @@ api.interceptors.response.use(
     },
     error => {
         if (error.response.status === 401) {
+            removeJwt();
             location.href = "/login";
             return false;
         }
