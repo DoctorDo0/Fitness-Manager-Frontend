@@ -69,11 +69,17 @@
 
   <!-- 按钮区 -->
   <div class="action">
-    <el-button type="primary" :icon="CirclePlus" @click="doAdd">新增</el-button>
-    <el-button type="primary" :icon="Edit" @click="doEdit">修改</el-button>
-    <el-button type="primary" :icon="Search" @click="doSearch">查询</el-button>
-    <el-button type="primary" :icon="Refresh" @click="resetForm">重置</el-button>
-    <el-button type="danger" :icon="Delete" @click="doDelete">删除</el-button>
+    <div class="action-left-button">
+      <el-button type="primary" :icon="CirclePlus" @click="doAdd">新增</el-button>
+      <el-button type="primary" :icon="Edit" @click="doEdit">修改</el-button>
+      <el-button type="primary" :icon="Search" @click="doSearch">查询</el-button>
+      <el-button type="primary" :icon="Refresh" @click="resetForm">重置</el-button>
+      <el-button type="danger" :icon="Delete" @click="doDelete">删除</el-button>
+    </div>
+    <div class="action-right-button">
+      <el-button :type="showDeleteButtonType" :icon="showDeleteButtonIcon" @click="showDelete">查看被删除内容
+      </el-button>
+    </div>
   </div>
 
   <!-- 数据区 -->
@@ -97,8 +103,9 @@
       <el-table-column prop="balance" label="资金" width="120" align="center"/>
       <el-table-column width="150" label="操作">
         <template #default="scope">
-          <el-button type="primary" size="small">编辑</el-button>
-          <el-button type="danger" size="small">删除</el-button>
+          <el-button v-if="!showDeleteFlag" type="primary" size="small">编辑</el-button>
+          <el-button v-if="!showDeleteFlag" type="danger" size="small">删除</el-button>
+          <el-button v-if="showDeleteFlag" type="warning" size="small">恢复</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -121,7 +128,7 @@
   <!--新增或修改的窗口-->
   <el-dialog v-model="showDlg" :title="dlgTitle" width="700"
              :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg">
-    <el-form label-width="90" label-position="right" :model="memberModel" ref="memberFormRef" >
+    <el-form label-width="90" label-position="right" :model="memberModel" ref="memberFormRef" :rules="rules">
       <el-row :gutter="20">
         <el-col :span="12">
 
@@ -215,6 +222,20 @@
 </template>
 
 <style scoped>
+.action {
+  display: flex;
+  justify-content: space-between; /* 左右两端对齐 */
+  align-items: center; /* 垂直居中 */
+  /*padding: 16px;
+  background-color: #f5f7fa;
+  border-radius: 4px;*/
+}
+
+.action-left-button, .action-right-button {
+  display: flex;
+  /*gap: 12px;  !* 按钮之间的间距 *!*/
+}
+
 .tbl {
   width: 100%;
 }
@@ -251,9 +272,9 @@
 </style>
 
 <script setup>
-import {ref, onMounted, reactive, toRaw, nextTick} from "vue";
+import {ref, shallowRef, onMounted, reactive, toRaw, nextTick} from "vue";
 import {findAll, deleteByIds as apiDelByIds, save, update} from "@/api/MemberApi.js";
-import {CirclePlus, Delete, Edit, Plus, Refresh, Search} from "@element-plus/icons-vue";
+import {CirclePlus, Delete, Edit, Hide, Plus, Refresh, Search, View} from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 //深度克隆
 import {cloneDeep} from "lodash";
@@ -286,6 +307,7 @@ let searchModel = ref({
   updateBy: null,
   balanceFrom: null,
   balanceTo: null,
+  active: null,
 });
 
 //封装查询功能，含更新数据
@@ -300,6 +322,7 @@ async function search(pageNo = pageinfo.pageNo, pageSize = pageinfo.pageSize, pa
 //查询按钮功能
 function doSearch() {
   let params = toRaw(searchModel.value);
+  params.active = !showDeleteFlag;
   search(pageinfo.currentPageNo, pageinfo.currentPageSize, params);
 }
 
@@ -503,6 +526,26 @@ function closeDlg() {
   memberFormRef.value.resetFields();
   //TODO:
   setInitialFormData();//bug fixed: 用于修复，当第一次进入界面后，先点击编辑后，再点击新增，导致新增界面回显为第一次点击编辑的数据的bug
+}
+
+//按钮切换字段及对象
+let showDeleteFlag = false;
+const showDeleteButtonType = ref("info")
+const showDeleteButtonIcon = shallowRef(Hide)
+
+//点击切换按钮，显示被删除的内容
+function showDelete() {
+  if (showDeleteFlag === false) {
+    showDeleteFlag = true;
+    showDeleteButtonType.value = "warning";
+    showDeleteButtonIcon.value = View;
+    doSearch();
+  } else if (showDeleteFlag === true) {
+    showDeleteFlag = false;
+    showDeleteButtonType.value = "info";
+    showDeleteButtonIcon.value = Hide;
+    doSearch();
+  }
 }
 
 //表格对象
