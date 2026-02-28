@@ -678,14 +678,15 @@ function doExport() {
     delete params.birthdayRange;
   }
 
-  let args = Object.entries(params).filter(([k, v]) => v != null).map(([k, v]) => k + "=" + v).join("&");
+  //旧版params为未展开的原始数据
+  // let args = Object.entries(params).filter(([k, v]) => v != null).map(([k, v]) => k + "=" + v).join("&");
+  let args = Object.entries(params.value).filter(([k, v]) => v != null).map(([k, v]) => k + "=" + v).join("&");
 
-  //console.log(args);
+  // console.log(args);
+  // console.log(params);
+  // console.log(params.value);
 
-  //TODO:
-  //此处args未生效，需要重写
-  // location.href = "/api/member/export?jwt=" + jwt + "&" + args;
-  location.href = "/api/member/export?jwt=" + jwt;
+  location.href = "/api/member/export?jwt=" + jwt + "&" + args;
 }
 
 //////////////////////////////////////////////////////////////
