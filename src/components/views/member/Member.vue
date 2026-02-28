@@ -71,6 +71,7 @@
       <el-button type="warning" :icon="Upload" @click="importAll">导入</el-button>
     </div>
     <div class="action-right-button">
+      <el-button v-if="showDeleteFlag" type="warning" :icon="RefreshLeft" @click="restoreAll">恢复</el-button>
       <el-button :type="showDeleteButtonType" :icon="showDeleteButtonIcon" @click="showDelete">查看被删除内容
       </el-button>
     </div>
@@ -97,9 +98,9 @@
       <el-table-column prop="balance" label="资金" width="120" align="center"/>
       <el-table-column width="150" label="操作">
         <template #default="scope">
-          <el-button v-if="!showDeleteFlag" type="primary" size="small">编辑</el-button>
-          <el-button v-if="!showDeleteFlag" type="danger" size="small">删除</el-button>
-          <el-button v-if="showDeleteFlag" type="warning" size="small">恢复</el-button>
+          <el-button v-if="!showDeleteFlag" type="primary" size="small" @click="rowEdit(scope.row)">编辑</el-button>
+          <el-button v-if="!showDeleteFlag" type="danger" size="small" @click="rowDelete(scope.row)">删除</el-button>
+          <el-button v-if="showDeleteFlag" type="warning" size="small" @click="rowRestore(scope.row)">恢复</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -290,8 +291,26 @@
 
 <script setup>
 import {ref, shallowRef, onMounted, reactive, toRaw, nextTick} from "vue";
-import {findAll, deleteByIds as apiDelByIds, save, update} from "@/api/MemberApi.js";
-import {CirclePlus, Delete, Download, Edit, Hide, Plus, Refresh, Search, Upload, View} from "@element-plus/icons-vue";
+import {
+  findAll,
+  deleteByIds as apiDeleteByIds,
+  save,
+  update,
+  restoreByIds as apiRestoreByIds
+} from "@/api/MemberApi.js";
+import {
+  CirclePlus,
+  Delete,
+  Download,
+  Edit,
+  Hide,
+  Plus,
+  Refresh,
+  RefreshLeft,
+  Search,
+  Upload,
+  View
+} from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 //深度克隆
 import {cloneDeep} from "lodash";
@@ -350,7 +369,7 @@ function resetForm() {
   formRef.value.resetFields();//重置表单
 }
 
-//页面删除逻辑
+//多行删除功能
 function doDelete() {
   //获取选中行
   let rows = tbl.value.getSelectionRows();
@@ -371,9 +390,22 @@ function doDelete() {
   });
 }
 
-//删除传递功能
+//右侧按钮删除单行
+function rowDelete(row) {
+  ElMessageBox.confirm("是否确认删除当前行?", "警告", {
+    type: "warning"
+  }).then(() => {
+    //点击ok操作
+    deleteByIds([row.id]);
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
+}
+
+//删除数据传递
 async function deleteByIds(ids) {
-  let resp = await apiDelByIds(ids);
+  let resp = await apiDeleteByIds(ids);
   ElMessage.success("删除操作成功，共删除" + resp.data + "条记录");
   doSearch();
 }
@@ -509,6 +541,19 @@ function doEdit() {
   }
 }
 
+//右侧按钮编辑单行
+function rowEdit(row) {
+  nextTick(() => {
+    mode.value = "edit";
+    row = cloneDeep(row);//克隆出的新对象没有响应式能力
+    row.password = null;
+
+    memberModel.value = row;
+    dlgTitle.value = "修改会员";
+    showDlg.value = true;
+  });
+}
+
 //提交会员表单
 function doSubmit() {
   memberFormRef.value.validate(async valid => {
@@ -564,6 +609,47 @@ function showDelete() {
   }
 }
 
+//多行恢复功能
+function restoreAll() {
+  //获取选中行
+  let rows = tbl.value.getSelectionRows();
+  let ids = rows.map(t => t.id);
+  if (ids.length === 0) {
+    ElMessage.error("未选择要恢复的行");
+    return;
+  }
+
+  ElMessageBox.confirm("是否确认恢复选中的行?", "警告", {
+    type: "warning"
+  }).then(() => {
+    //点击ok操作
+    restoreByIds(ids);
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
+}
+
+//右侧按钮恢复单行
+function rowRestore(row) {
+  ElMessageBox.confirm("是否确认恢复当前行?", "警告", {
+    type: "warning"
+  }).then(() => {
+    //点击ok操作
+    restoreByIds([row.id]);
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
+}
+
+//恢复数据传递
+async function restoreByIds(ids) {
+  let resp = await apiRestoreByIds(ids);
+  ElMessage.success("恢复操作成功，共恢复" + resp.data + "条记录");
+  doSearch();
+}
+
 //表格对象
 const tbl = ref();
 
@@ -596,6 +682,8 @@ function doExport() {
 
   //console.log(args);
 
+  //TODO:
+  //此处args未生效，需要重写
   // location.href = "/api/member/export?jwt=" + jwt + "&" + args;
   location.href = "/api/member/export?jwt=" + jwt;
 }

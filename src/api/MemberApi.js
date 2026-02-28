@@ -36,4 +36,12 @@ function update(member) {
     });
 }
 
-export {findAll, deleteByIds, save, update}
+function restoreByIds(ids) {
+    return api({
+        url: "/member",
+        method: "patch",
+        data: ids
+    })
+}
+
+export {findAll, deleteByIds, save, update, restoreByIds}
