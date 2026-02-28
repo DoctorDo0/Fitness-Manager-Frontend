@@ -56,14 +56,6 @@
         />
       </el-form-item>
 
-      <el-form-item label="资金起始数量:" prop="balanceFrom">
-        <el-input v-model="searchModel.balanceFrom" placeholder="输入起始资金"/>
-      </el-form-item>
-
-      <el-form-item label="资金结束数量:" prop="balanceTo">
-        <el-input v-model="searchModel.balanceTo" placeholder="输入结束资金"/>
-      </el-form-item>
-
     </el-form>
   </div>
 
@@ -75,6 +67,8 @@
       <el-button type="primary" :icon="Search" @click="doSearch">查询</el-button>
       <el-button type="primary" :icon="Refresh" @click="resetForm">重置</el-button>
       <el-button type="danger" :icon="Delete" @click="doDelete">删除</el-button>
+      <el-button type="success" :icon="Download" @click="doExport">导出</el-button>
+      <el-button type="warning" :icon="Upload" @click="importAll">导入</el-button>
     </div>
     <div class="action-right-button">
       <el-button :type="showDeleteButtonType" :icon="showDeleteButtonIcon" @click="showDelete">查看被删除内容
@@ -219,6 +213,29 @@
     </template>
   </el-dialog>
 
+  <!-- excel上传对话框 -->
+  <el-dialog title="导入会员" v-model="showImportDialog" draggable @close="onCloseImportDialog" destroy-on-close
+             style="width: 400px">
+    <el-form ref="importFormRef">
+      <el-form-item label="选择文件：">
+
+        <el-upload action="/api/member/import" :headers="headers" :on-success="onImportSuccess"
+                   accept=".xlsx" :auto-upload="false" :limit="1" ref="uploadRef">
+          <template #trigger>
+            <el-button type="primary">选择会员列表文件（.xlsx）</el-button>
+          </template>
+        </el-upload>
+
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="footer">
+        <el-button type="primary" @click="submitImportExcel">确定</el-button>
+        <el-button @click="showImportDialog = false">取消</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 </template>
 
 <style scoped>
@@ -274,10 +291,11 @@
 <script setup>
 import {ref, shallowRef, onMounted, reactive, toRaw, nextTick} from "vue";
 import {findAll, deleteByIds as apiDelByIds, save, update} from "@/api/MemberApi.js";
-import {CirclePlus, Delete, Edit, Hide, Plus, Refresh, Search, View} from "@element-plus/icons-vue";
+import {CirclePlus, Delete, Download, Edit, Hide, Plus, Refresh, Search, Upload, View} from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 //深度克隆
 import {cloneDeep} from "lodash";
+import {getJwt} from "@/api/JwtApi.js";
 
 //表格数据
 const members = ref();
@@ -305,8 +323,6 @@ let searchModel = ref({
   registerBy: null,
   updateDateRange: [],
   updateBy: null,
-  balanceFrom: null,
-  balanceTo: null,
   active: null,
 });
 
@@ -559,6 +575,69 @@ function tableRowClick(row) {
 //页面导航功能
 function pageChange() {
   doSearch();
+}
+
+//////////////////////////////////////////////////////////////
+//导出到excel
+function doExport() {
+  let jwt = getJwt();
+
+  //TODO:
+  // 后台包含处理数据能力，此处可注释
+  //查询条件
+  let params = toRaw(searchModel);
+  if (params.birthdayRange) {
+    params.birthdayFrom = params.birthdayRange[0];
+    params.birthdayTo = params.birthdayRange[1];
+    delete params.birthdayRange;
+  }
+
+  let args = Object.entries(params).filter(([k, v]) => v != null).map(([k, v]) => k + "=" + v).join("&");
+
+  //console.log(args);
+
+  // location.href = "/api/member/export?jwt=" + jwt + "&" + args;
+  location.href = "/api/member/export?jwt=" + jwt;
+}
+
+//////////////////////////////////////////////////////////////
+const showImportDialog = ref(false);
+const importFormRef = ref();
+//请求头，jwt
+const headers = reactive({
+  "Authorization": getJwt()
+});
+
+//导入会员
+function importAll() {
+  showImportDialog.value = true;
+}
+
+function onCloseImportDialog() {
+  //TODO:
+  // 作用是当关闭时重置状态
+  // 使用resetFields时el-form需要ref和model，el-form-item需要prop
+  // 正常使用时会警告，不使用该方法时仍能重置状态，故暂时注释掉该代码
+  // importFormRef.value.resetFields();
+}
+
+//上传成功后的回调
+function onImportSuccess(resp) {
+  if (resp.success) {
+    ElMessage.success("导入成功，共导入" + resp.data + "行");
+    showImportDialog.value = false;
+    doSearch();
+  } else {
+    ElMessage.error(resp.msg || "导入失败");
+  }
+}
+
+//upload实例
+const uploadRef = ref();
+
+//提交文件并上传
+function submitImportExcel() {
+  uploadRef.value.submit();
 }
 
 </script>
