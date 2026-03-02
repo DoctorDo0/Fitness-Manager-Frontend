@@ -8,14 +8,14 @@ const menus = [
             name: "员工管理",
             url: "/main/employee"
         }, {
-            name: "教练管理",
-            url: "/main/trainer"
+            name: "学生管理",
+            url: "/main/student"
         }, {
-            name: "会员管理",
-            url: "/main/member"
+            name: "教师管理",
+            url: "/main/teacher"
         }, {
             name: "课程管理",
-            url: "/main/lesson"
+            url: "/main/course"
         }, {
             name: "预约管理",
             url: "/main/reserve"

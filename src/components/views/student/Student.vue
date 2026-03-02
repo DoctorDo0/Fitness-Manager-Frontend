@@ -3,8 +3,8 @@
   <div class="search">
     <el-form inline ref="formRef" :model="searchModel">
 
-      <el-form-item label="会员号:" prop="memberId">
-        <el-input v-model="searchModel.memberId" placeholder="输入会员号"/>
+      <el-form-item label="会员号:" prop="studentId">
+        <el-input v-model="searchModel.studentId" placeholder="输入会员号"/>
       </el-form-item>
 
       <el-form-item label="姓名:" prop="name">
@@ -80,10 +80,10 @@
   <!-- 数据区 -->
   <div class="grid">
     <!--简写形式 v-bind:可简写为: v-on:可简写为@-->
-    <el-table class="tbl" v-bind:data="members" stripe border v-on:row-click="tableRowClick" height="500" ref="tbl">
+    <el-table class="tbl" v-bind:data="students" stripe border v-on:row-click="tableRowClick" height="500" ref="tbl">
       <el-table-column type="selection" align="center" fixed/>
       <el-table-column prop="id" label="ID" width="80" fixed/>
-      <el-table-column prop="memberId" label="会员ID" width="100" fixed/>
+      <el-table-column prop="studentId" label="会员ID" width="100" fixed/>
 
       <el-table-column prop="avatar" label="头像" width="100" fixed="left">
         <template #default="scope">
@@ -130,22 +130,22 @@
   <!--新增或修改的窗口-->
   <el-dialog v-model="showDlg" :title="dlgTitle" width="700"
              :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg">
-    <el-form label-width="90" label-position="right" :model="memberModel" ref="memberFormRef" :rules="rules">
+    <el-form label-width="90" label-position="right" :model="studentModel" ref="studentFormRef" :rules="rules">
       <el-row :gutter="20">
         <el-col :span="12">
 
-          <el-form-item label="会员ID：" prop="memberId">
-            <el-input v-model="memberModel.memberId" placeholder="请输入账号" :readonly="mode.valueOf() ==='edit'"
+          <el-form-item label="会员ID：" prop="studentId">
+            <el-input v-model="studentModel.studentId" placeholder="请输入账号" :readonly="mode.valueOf() ==='edit'"
                       :disabled="mode.valueOf() ==='edit'"/>
           </el-form-item>
-          <el-form-item label="密码：" prop="memberPassword">
-            <el-input type="password" v-model="memberModel.memberPassword" show-password placeholder="请输入密码"/>
+          <el-form-item label="密码：" prop="studentPassword">
+            <el-input type="password" v-model="studentModel.studentPassword" show-password placeholder="请输入密码"/>
           </el-form-item>
           <el-form-item label="姓名：" prop="name">
-            <el-input v-model="memberModel.name" placeholder="请输入姓名"/>
+            <el-input v-model="studentModel.name" placeholder="请输入姓名"/>
           </el-form-item>
           <el-form-item label="出生日期：" prop="birthday">
-            <el-date-picker v-model="memberModel.birthday" type="date" placeholder="请选择出生日期"
+            <el-date-picker v-model="studentModel.birthday" type="date" placeholder="请选择出生日期"
                             style="width: 100%"/>
           </el-form-item>
 
@@ -154,10 +154,10 @@
         <el-col :span="12">
           <el-form-item label="头像：" prop="avatar">
             <!-- 上传表单 -->
-            <el-upload class="avatar-uploader" action="/api/member/avatar" :headers="headers"
+            <el-upload class="avatar-uploader" action="/api/student/avatar" :headers="headers"
                        :show-file-list="false" :on-success="avatarUploadSuccess">
-              <div class="avatar-img" v-if="memberModel.avatar"
-                   :style="'background-image: url('+memberModel.avatar+')'"></div>
+              <div class="avatar-img" v-if="studentModel.avatar"
+                   :style="'background-image: url('+studentModel.avatar+')'"></div>
               <el-icon class="avatar-icon">
                 <Plus/>
               </el-icon>
@@ -171,7 +171,7 @@
 
         <el-col :span="12">
           <el-form-item label="性别：" prop="gender">
-            <el-radio-group v-model="memberModel.gender">
+            <el-radio-group v-model="studentModel.gender">
               <el-radio value="男">男</el-radio>
               <el-radio value="女">女</el-radio>
             </el-radio-group>
@@ -180,7 +180,7 @@
 
         <el-col :span="12">
           <el-form-item label="手机号：" prop="phone">
-            <el-input type="tel" v-model="memberModel.phone" placeholder="请输入手机号"/>
+            <el-input type="tel" v-model="studentModel.phone" placeholder="请输入手机号"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -188,12 +188,12 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="邮箱号：" prop="email">
-            <el-input v-model="memberModel.email" placeholder="请输入邮箱号"/>
+            <el-input v-model="studentModel.email" placeholder="请输入邮箱号"/>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="微信号：" prop="wechat">
-            <el-input v-model="memberModel.wechat" placeholder="请输入微信号"/>
+            <el-input v-model="studentModel.wechat" placeholder="请输入微信号"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -201,7 +201,7 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item label="QQ号：" prop="qq">
-            <el-input v-model="memberModel.qq" placeholder="请输入QQ号"/>
+            <el-input v-model="studentModel.qq" placeholder="请输入QQ号"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -209,7 +209,7 @@
       <el-row :gutter="20">
         <el-col :span="24">
           <el-form-item label="备注：" prop="description">
-            <el-input type="textarea" v-model="memberModel.description" placeholder="请输入备注"
+            <el-input type="textarea" v-model="studentModel.description" placeholder="请输入备注"
                       input-style="height:100px"/>
           </el-form-item>
         </el-col>
@@ -229,7 +229,7 @@
     <el-form ref="importFormRef">
       <el-form-item label="选择文件：">
 
-        <el-upload action="/api/member/import" :headers="headers" :on-success="onImportSuccess"
+        <el-upload action="/api/student/import" :headers="headers" :on-success="onImportSuccess"
                    accept=".xlsx" :auto-upload="false" :limit="1" ref="uploadRef">
           <template #trigger>
             <el-button type="primary">选择会员列表文件（.xlsx）</el-button>
@@ -278,7 +278,7 @@
 .avatar-uploader {
   position: relative;
   /*width: 100%;*/
-  /*width: 170px;*/
+  width: 170px;
   height: 170px; /*影响高度，进一步影响头像icon位置*/
   border: 1px dashed #ccc;
   display: flex;
@@ -326,7 +326,7 @@ import {
   save,
   update,
   restoreByIds as apiRestoreByIds
-} from "@/api/MemberApi.js";
+} from "@/api/StudentApi.js";
 import {
   CirclePlus,
   Delete,
@@ -346,7 +346,7 @@ import {cloneDeep} from "lodash";
 import {getJwt} from "@/api/JwtApi.js";
 
 //表格数据
-const members = ref();
+const students = ref();
 
 //页面数据
 const pageinfo = reactive({
@@ -362,7 +362,7 @@ onMounted(() => {
 
 //封装表单查询条件
 let searchModel = ref({
-  memberId: null,
+  studentId: null,
   avatar: null,
   name: null,
   gender: null,
@@ -378,7 +378,7 @@ let searchModel = ref({
 //封装查询功能，含更新数据
 async function search(pageNo = pageinfo.pageNo, pageSize = pageinfo.pageSize, params = {}) {
   let resp = await findAll(pageNo, pageSize, params);
-  members.value = resp.data.list;
+  students.value = resp.data.list;
   pageinfo.currentPageNo = resp.data.pageNum;
   pageinfo.currentPageSize = resp.data.pageSize;
   pageinfo.total = resp.data.total;
@@ -447,9 +447,9 @@ const showDlg = ref(false);
 //对话框标题
 const dlgTitle = ref();
 //新增表单数据模型
-const memberModel = ref({
-  memberId: null,
-  memberPassword: null,
+const studentModel = ref({
+  studentId: null,
+  studentPassword: null,
   name: null,
   gender: "男",
   birthday: null,
@@ -462,30 +462,30 @@ const memberModel = ref({
 });
 
 function setInitialFormData() {
-  // memberModel.value = cloneDeep(memberModel.value);
-  memberModel.value.memberId = null;
-  memberModel.value.memberPassword = null;
-  memberModel.value.name = null;
-  memberModel.value.gender = "男";
-  memberModel.value.birthday = null;
-  memberModel.value.phone = null;
-  memberModel.value.email = null;
-  memberModel.value.wechat = null;
-  memberModel.value.qq = null;
-  memberModel.value.description = null;
-  memberModel.value.avatar = null;
+  // studentModel.value = cloneDeep(studentModel.value);
+  studentModel.value.studentId = null;
+  studentModel.value.studentPassword = null;
+  studentModel.value.name = null;
+  studentModel.value.gender = "男";
+  studentModel.value.birthday = null;
+  studentModel.value.phone = null;
+  studentModel.value.email = null;
+  studentModel.value.wechat = null;
+  studentModel.value.qq = null;
+  studentModel.value.description = null;
+  studentModel.value.avatar = null;
 }
 
 //新增/修改表单对象
-const memberFormRef = ref();
+const studentFormRef = ref();
 
 //校验规则
 const rules = {
-  memberId: [
+  studentId: [
     {required: true, message: "会员账号不可为空", trigger: "blur"},
     {min: 6, max: 12, message: "账号必须介于6~12位", trigger: "blur"}
   ],
-  memberPassword: [
+  studentPassword: [
     {validator: validateFormPass, trigger: "blur"}
   ],
   name: [
@@ -564,7 +564,7 @@ function doEdit() {
       row = cloneDeep(row);//克隆出的新对象没有响应式能力
       row.password = null;
 
-      memberModel.value = row;
+      studentModel.value = row;
       dlgTitle.value = "修改会员";
       showDlg.value = true;
     });
@@ -578,7 +578,7 @@ function rowEdit(row) {
     row = cloneDeep(row);//克隆出的新对象没有响应式能力
     row.password = null;
 
-    memberModel.value = row;
+    studentModel.value = row;
     dlgTitle.value = "修改会员";
     showDlg.value = true;
   });
@@ -586,9 +586,9 @@ function rowEdit(row) {
 
 //提交会员表单
 function doSubmit() {
-  memberFormRef.value.validate(async valid => {
+  studentFormRef.value.validate(async valid => {
     if (valid) {
-      let params = toRaw(memberModel.value);
+      let params = toRaw(studentModel.value);
       if (mode.value === "add") {
         let resp = await save(params);
         if (resp.success) {
@@ -614,7 +614,7 @@ function doSubmit() {
 
 //关闭对话框时触发
 function closeDlg() {
-  memberFormRef.value.resetFields();
+  studentFormRef.value.resetFields();
   //TODO:
   setInitialFormData();//bug fixed: 用于修复，当第一次进入界面后，先点击编辑后，再点击新增，导致新增界面回显为第一次点击编辑的数据的bug
 }
@@ -716,7 +716,7 @@ function doExport() {
   // console.log(params);
   // console.log(params.value);
 
-  location.href = "/api/member/export?jwt=" + jwt + "&" + args;
+  location.href = "/api/student/export?jwt=" + jwt + "&" + args;
 }
 
 //////////////////////////////////////////////////////////////
@@ -762,7 +762,7 @@ function submitImportExcel() {
 //头像文件上传成功之后的回调函数
 function avatarUploadSuccess(resp) {
   if (resp.success) {
-    memberModel.value.avatar = resp.data;
+    studentModel.value.avatar = resp.data;
   } else {
     ElMessage.error("头像上传失败");
   }

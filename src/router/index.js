@@ -9,13 +9,13 @@ const routes = [
         component: () => import("@/components/views/Main.vue"),
         children: [
             {
-                name: "main-member",
-                path: "/main/member",
-                component: () => import("@/components/views/member/Member.vue")
+                name: "main-student",
+                path: "/main/student",
+                component: () => import("@/components/views/student/Student.vue")
             }, {
-                name: "main-trainer",
-                path: "/main/trainer",
-                component: () => import("@/components/views/trainer/Trainer.vue")
+                name: "main-teacher",
+                path: "/main/teacher",
+                component: () => import("@/components/views/teacher/Teacher.vue")
             }
         ]
     }, {
@@ -27,13 +27,13 @@ const routes = [
         path: "/login",
         component: () => import("@/components/views/Login.vue")
     }, {
-        name: "trainer",
-        path: "/trainer",
-        component: () => import("@/components/views/trainer/Trainer.vue")
+        name: "teacher",
+        path: "/teacher",
+        component: () => import("@/components/views/teacher/Teacher.vue")
     }, {
-        name: "member",
-        path: "/member",
-        component: () => import("@/components/views/member/Member.vue")
+        name: "student",
+        path: "/student",
+        component: () => import("@/components/views/student/Student.vue")
     }, {
         name: "setting",
         path: "/setting",

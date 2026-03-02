@@ -3,7 +3,7 @@
     <div class="login-body">
       <div class="pic"></div>
       <div class="form">
-        <h1>中享思途-健身会馆客户预约管理系统</h1>
+        <h1>中享思途-校园课程预约管理系统</h1>
         <el-form style="padding: 10px" :model="loginModel" :rules="rules" ref="loginFormRef">
           <el-row>
             <el-col :span="24">
@@ -45,7 +45,7 @@
     </div>
     <div class="mask"></div>
     <div class="copyright">
-      <h2>&copy;版权所有 中享思途-健身会馆</h2>
+      <h2>&copy;版权所有 中享思途-课程管理中心</h2>
     </div>
   </div>
 </template>

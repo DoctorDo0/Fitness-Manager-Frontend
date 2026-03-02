@@ -2,11 +2,11 @@ import api from "@/utils/api.js";
 
 function findAll(pageNo, pageSize, params) {
     return api({
-        url: "/member",
+        url: "/student",
         method: "get",
         params: {
-            pageNo,
-            pageSize,
+            page: pageNo,
+            limit: pageSize,
             ...params
         }
     });
@@ -14,31 +14,31 @@ function findAll(pageNo, pageSize, params) {
 
 function deleteByIds(ids) {
     return api({
-        url: "/member",
+        url: "/student",
         method: "delete",
         data: ids
     })
 }
 
-function save(member) {
+function save(student) {
     return api({
-        url: "/member",
+        url: "/student",
         method: "post",
-        data: member
+        data: student
     });
 }
 
-function update(member) {
+function update(student) {
     return api({
-        url: "/member",
+        url: "/student",
         method: "put",
-        data: member
+        data: student
     });
 }
 
 function restoreByIds(ids) {
     return api({
-        url: "/member",
+        url: "/student",
         method: "patch",
         data: ids
     })

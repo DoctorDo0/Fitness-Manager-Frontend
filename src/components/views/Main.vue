@@ -2,7 +2,7 @@
   <div style="height: 100%">
     <el-container style="height: 100%">
       <el-header class="header">
-        <h1>中享思途健身会馆客户预约管理系统</h1>
+        <h1>中享思途校园课程预约管理系统</h1>
         <div class="logout">
           <el-button type="danger" @click="logout">注销</el-button>
         </div>
