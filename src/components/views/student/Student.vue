@@ -3,8 +3,8 @@
   <div class="search">
     <el-form inline ref="formRef" :model="searchModel">
 
-      <el-form-item label="会员号:" prop="studentId">
-        <el-input v-model="searchModel.studentId" placeholder="输入会员号"/>
+      <el-form-item label="学生ID:" prop="studentId">
+        <el-input v-model="searchModel.studentId" placeholder="输入学生ID"/>
       </el-form-item>
 
       <el-form-item label="姓名:" prop="name">
@@ -83,7 +83,7 @@
     <el-table class="tbl" v-bind:data="students" stripe border v-on:row-click="tableRowClick" height="500" ref="tbl">
       <el-table-column type="selection" align="center" fixed/>
       <el-table-column prop="id" label="ID" width="80" fixed/>
-      <el-table-column prop="studentId" label="会员ID" width="100" fixed/>
+      <el-table-column prop="studentId" label="学生学号" width="100" fixed/>
 
       <el-table-column prop="avatar" label="头像" width="100" fixed="left">
         <template #default="scope">
@@ -102,7 +102,6 @@
       <el-table-column prop="registerBy" label="注册操作人" width="120" align="center"/>
       <el-table-column prop="updateDate" label="最后更新日期" width="160" align="center"/>
       <el-table-column prop="updateBy" label="更新操作人" width="120" align="center"/>
-      <el-table-column prop="balance" label="资金" width="120" align="center"/>
       <el-table-column width="150" label="操作">
         <template #default="scope">
           <el-button v-if="!showDeleteFlag" type="primary" size="small" @click="rowEdit(scope.row)">编辑</el-button>
@@ -130,12 +129,12 @@
   <!--新增或修改的窗口-->
   <el-dialog v-model="showDlg" :title="dlgTitle" width="700"
              :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg">
-    <el-form label-width="90" label-position="right" :model="studentModel" ref="studentFormRef" :rules="rules">
+    <el-form label-width="100" label-position="right" :model="studentModel" ref="studentFormRef" :rules="rules">
       <el-row :gutter="20">
         <el-col :span="12">
 
-          <el-form-item label="会员ID：" prop="studentId">
-            <el-input v-model="studentModel.studentId" placeholder="请输入账号" :readonly="mode.valueOf() ==='edit'"
+          <el-form-item label="学生学号：" prop="studentId">
+            <el-input v-model="studentModel.studentId" placeholder="请输入学生学号" :readonly="mode.valueOf() ==='edit'"
                       :disabled="mode.valueOf() ==='edit'"/>
           </el-form-item>
           <el-form-item label="密码：" prop="studentPassword">
@@ -224,7 +223,7 @@
   </el-dialog>
 
   <!-- excel上传对话框 -->
-  <el-dialog title="导入会员" v-model="showImportDialog" draggable @close="onCloseImportDialog" destroy-on-close
+  <el-dialog title="导入学生" v-model="showImportDialog" draggable @close="onCloseImportDialog" destroy-on-close
              style="width: 400px">
     <el-form ref="importFormRef">
       <el-form-item label="选择文件：">
@@ -232,7 +231,7 @@
         <el-upload action="/api/student/import" :headers="headers" :on-success="onImportSuccess"
                    accept=".xlsx" :auto-upload="false" :limit="1" ref="uploadRef">
           <template #trigger>
-            <el-button type="primary">选择会员列表文件（.xlsx）</el-button>
+            <el-button type="primary">选择学生列表文件（.xlsx）</el-button>
           </template>
         </el-upload>
 
@@ -482,14 +481,14 @@ const studentFormRef = ref();
 //校验规则
 const rules = {
   studentId: [
-    {required: true, message: "会员账号不可为空", trigger: "blur"},
-    {min: 6, max: 12, message: "账号必须介于6~12位", trigger: "blur"}
+    {required: true, message: "ID不可为空", trigger: "blur"},
+    {min: 6, max: 12, message: "ID必须介于6~12位", trigger: "blur"}
   ],
   studentPassword: [
     {validator: validateFormPass, trigger: "blur"}
   ],
   name: [
-    {required: true, message: "会员姓名不可为空", trigger: "blur"},
+    {required: true, message: "姓名不可为空", trigger: "blur"},
     {min: 2, max: 20, message: "姓名必须介于2~20位", trigger: "blur"}
   ],
   gender: [
@@ -498,10 +497,10 @@ const rules = {
   birthday: [
     {type: "date", message: "出生日期格式不正确", trigger: "blur"}
   ],
-  phone: [
-    {required: true, message: "会员手机号不可为空", trigger: "blur"},
+  /*phone: [
+    {required: true, message: "手机号不可为空", trigger: "blur"},
     {validator: validateFormPhone, trigger: "blur"}
-  ],
+  ],*/
   email: [
     {type: "email", message: "邮箱格式不正确", trigger: "blur"}
   ]
@@ -510,7 +509,7 @@ const rules = {
 //性别校验
 function validateFormGender(rule, value, cb) {
   if (value === "男" || value === "女") {
-    cb();
+    cb();//无错误
   } else {
     cb(new Error("性别只能是男或女"));
   }
@@ -519,7 +518,7 @@ function validateFormGender(rule, value, cb) {
 //手机号校验
 function validateFormPhone(rule, value, cb) {
   if (value.match(/^\d{11}$/)) {
-    cb();//无错误
+    cb();
   } else {
     cb(new Error("手机号必须是11位数字格式"));
   }
@@ -546,7 +545,7 @@ function validateFormPass(rule, value, cb) {
 function doAdd() {
   mode.value = "add";
   showDlg.value = true;
-  dlgTitle.value = "新增会员";
+  dlgTitle.value = "新增学生";
 }
 
 //编辑功能
@@ -565,7 +564,7 @@ function doEdit() {
       row.password = null;
 
       studentModel.value = row;
-      dlgTitle.value = "修改会员";
+      dlgTitle.value = "修改学生";
       showDlg.value = true;
     });
   }
@@ -579,12 +578,12 @@ function rowEdit(row) {
     row.password = null;
 
     studentModel.value = row;
-    dlgTitle.value = "修改会员";
+    dlgTitle.value = "修改学生";
     showDlg.value = true;
   });
 }
 
-//提交会员表单
+//提交学生表单
 function doSubmit() {
   studentFormRef.value.validate(async valid => {
     if (valid) {
@@ -592,20 +591,20 @@ function doSubmit() {
       if (mode.value === "add") {
         let resp = await save(params);
         if (resp.success) {
-          ElMessage.success("保存会员信息成功");
+          ElMessage.success("保存学生信息成功");
           showDlg.value = false;
           doSearch();
         } else {
-          ElMessage.error(resp.message || "保存会员信息失败");
+          ElMessage.error(resp.message || "保存学生信息失败");
         }
       } else if (mode.value === "edit") {
         let resp = await update(params);
         if (resp.success) {
-          ElMessage.success("修改会员信息成功");
+          ElMessage.success("修改学生信息成功");
           showDlg.value = false;
           doSearch();
         } else {
-          ElMessage.error(resp.message || "修改会员信息失败");
+          ElMessage.error(resp.message || "修改学生信息失败");
         }
       }
     }
@@ -727,7 +726,7 @@ const headers = reactive({
   "Authorization": getJwt()
 });
 
-//导入会员
+//导入学生
 function importAll() {
   showImportDialog.value = true;
 }

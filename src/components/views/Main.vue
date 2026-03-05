@@ -4,6 +4,10 @@
       <el-header class="header">
         <h1>中享思途校园课程预约管理系统</h1>
         <div class="logout">
+          <div class="hello">
+            <div>你好，</div>
+            <div v-text="userName"></div>
+          </div>
           <el-button type="danger" @click="logout">注销</el-button>
         </div>
       </el-header>
@@ -104,10 +108,20 @@
   background-color: #fff;
 }
 
+.hello {
+  display: flex;
+  align-items: center; /* 垂直居中 */
+  justify-content: center; /* 水平居中 */
+  text-align: center; /* 文本居中 */
+  padding-right: 20px;
+}
+
 .logout {
   position: absolute;
+  display: flex;
   right: 15px;
   bottom: 15px;
+  margin-right: 40px;
 }
 </style>
 
@@ -115,11 +129,24 @@
 import menus from "@/api/MenuApi.js";
 import {removeJwt} from "@/api/JwtApi.js";
 import {useRouter} from "vue-router";
+import {onMounted, ref} from "vue";
+import {getUserName as UserName} from "@/api/UserApi.js";
 
 let router = useRouter();
 
 function logout() {
   removeJwt();
   router.push("/login");
+}
+
+const userName = ref("");
+
+//页面就绪后执行
+onMounted(() => {
+  getUserName();
+});
+
+async function getUserName() {
+  userName.value = (await UserName()).data;
 }
 </script>

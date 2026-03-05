@@ -16,6 +16,22 @@ const routes = [
                 name: "main-teacher",
                 path: "/main/teacher",
                 component: () => import("@/components/views/teacher/Teacher.vue")
+            }, {
+                name: "main-course",
+                path: "/main/course",
+                component: () => import("@/components/views/course/Course.vue")
+            }, {
+                name: "main-course-info",
+                path: "/main/course-info",
+                component: () => import("@/components/views/course-info/Course-info.vue")
+            }, {
+                name: "main-appointment",
+                path: "/main/appointment",
+                component: () => import("@/components/views/appointment/Appointment.vue")
+            }, {
+                name: "main-calendar",
+                path: "/main/calendar",
+                component: () => import("@/components/views/calendar/Calendar.vue")
             }
         ]
     }, {
@@ -26,15 +42,37 @@ const routes = [
         name: "login",
         path: "/login",
         component: () => import("@/components/views/Login.vue")
+    },
+
+    //单独页面部分
+    //==========
+    {
+        name: "student",
+        path: "/student",
+        component: () => import("@/components/views/student/Student.vue")
     }, {
         name: "teacher",
         path: "/teacher",
         component: () => import("@/components/views/teacher/Teacher.vue")
     }, {
-        name: "student",
-        path: "/student",
-        component: () => import("@/components/views/student/Student.vue")
+        name: "course",
+        path: "/course",
+        component: () => import("@/components/views/course/Course.vue")
     }, {
+        name: "course-info",
+        path: "/course-info",
+        component: () => import("@/components/views/course-info/Course-info.vue")
+    }, {
+        name: "appointment",
+        path: "/appointment",
+        component: () => import("@/components/views/appointment/Appointment.vue")
+    }, {
+        name: "calendar",
+        path: "/calendar",
+        component: () => import("@/components/views/calendar/Calendar.vue")
+    },
+    //==========
+    {
         name: "setting",
         path: "/setting",
         component: () => import("@/components/views/Setting.vue")

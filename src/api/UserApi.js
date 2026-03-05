@@ -8,4 +8,11 @@ function login(params) {
     });
 }
 
-export {login};
+function getUserName() {
+    return api({
+        url: "/users/getusername",
+        method: "get"
+    })
+}
+
+export {login, getUserName};
