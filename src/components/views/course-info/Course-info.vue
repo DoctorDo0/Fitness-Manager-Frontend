@@ -27,7 +27,14 @@
       </el-form-item>
 
       <el-form-item label="课时:" prop="coursePeriod">
-        <el-input v-model="searchModel.coursePeriod" placeholder="输入课时"/>
+        <el-select v-model="searchModel.coursePeriod" placeholder="选择课时" style="width: 240px">
+          <el-option
+              v-for="item in coursePeriodOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="课程地点:" prop="courseAddress">
@@ -95,8 +102,18 @@
         <el-col :span="12">
 
           <el-form-item label="课程ID：" prop="courseId">
-            <el-input v-model="courseInfoModel.courseId" placeholder="请输入课程ID"/>
+            <el-select v-model="courseInfoModel.courseId" placeholder="请输入课程ID" value-key="id"
+                       filterable clearable>
+              <el-option
+                  v-for="item in courseMainInfoOptions"
+                  :key="item.id"
+                  :label="item.courseId+' -- '+item.courseName"
+                  :value="item.id"
+              >
+              </el-option>
+            </el-select>
           </el-form-item>
+
           <el-form-item label="课程日期：" prop="courseDate">
             <el-date-picker v-model="courseInfoModel.courseDate" type="date" placeholder="请输入课程日期"
                             style="width: 100%"/>
@@ -110,10 +127,27 @@
         <el-col :span="12">
 
           <el-form-item label="教师ID：" prop="teacherId">
-            <el-input v-model="courseInfoModel.teacherId" placeholder="请输入教师ID"/>
+            <el-select v-model="courseInfoModel.teacherId" placeholder="请输入教师ID" value-key="id"
+                       filterable clearable>
+              <el-option
+                  v-for="item in teacherMainInfoOptions"
+                  :key="item.id"
+                  :label="item.teacherId+' -- '+item.name"
+                  :value="item.id"
+              >
+              </el-option>
+            </el-select>
           </el-form-item>
+
           <el-form-item label="课时：" prop="coursePeriod">
-            <el-input v-model="courseInfoModel.coursePeriod" placeholder="请输入课时"/>
+            <el-select v-model="courseInfoModel.coursePeriod" placeholder="选择课时" style="width: 240px">
+              <el-option
+                  v-for="item in coursePeriodOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
           </el-form-item>
 
         </el-col>
@@ -166,7 +200,9 @@ import {
   findAll,
   deleteByIds as apiDeleteByIds,
   save,
-  update
+  update,
+  getCourseMainInfo,
+  getTeacherMainInfo
 } from "@/api/CourseInfoApi.js";
 import {
   CirclePlus,
@@ -189,10 +225,34 @@ const pageinfo = reactive({
   total: 0,
 });
 
+//新增的课程与教师下拉列表(选择器)
+const courseMainInfoOptions = ref();
+const teacherMainInfoOptions = ref();
+
 //页面就绪后执行
 onMounted(() => {
   search(pageinfo.currentPageNo, pageinfo.currentPageSize);
+  setCourseMainInfoOptions();
+  setTeacherMainInfoOptions();
 });
+
+async function setCourseMainInfoOptions() {
+  let resp = await getCourseMainInfo();
+  courseMainInfoOptions.value = resp.data.map(item => ({
+    id: item.id,
+    courseId: item.courseId,
+    courseName: item.courseName
+  }));
+}
+
+async function setTeacherMainInfoOptions() {
+  let resp = await getTeacherMainInfo();
+  teacherMainInfoOptions.value = resp.data.map(item => ({
+    id: item.id,
+    teacherId: item.teacherId,
+    name: item.name
+  }));
+}
 
 //封装表单查询条件
 let searchModel = ref({
@@ -214,6 +274,30 @@ let searchModel = ref({
     gender: null
   }
 });
+
+//查询与新增的课时下拉列表(选择器)
+const coursePeriodOptions = [
+  {
+    value: '',
+    label: '任意不限',
+  },
+  {
+    value: '1',
+    label: '1',
+  },
+  {
+    value: '2',
+    label: '2',
+  },
+  {
+    value: '3',
+    label: '3',
+  },
+  {
+    value: '4',
+    label: '4',
+  },
+]
 
 //封装查询功能，含更新数据
 async function search(pageNo = pageinfo.pageNo, pageSize = pageinfo.pageSize, params = {}) {

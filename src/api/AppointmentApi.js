@@ -36,4 +36,18 @@ function update(appointment) {
     });
 }
 
-export {findAll, deleteByIds, save, update}
+function getStudentMainInfo() {
+    return api({
+        url: "/student/mainInfo",
+        method: "get"
+    });
+}
+
+function getCourseInfoMainInfo() {
+    return api({
+        url: "/course-info/mainInfo",
+        method: "get"
+    });
+}
+
+export {findAll, deleteByIds, save, update, getStudentMainInfo, getCourseInfoMainInfo}

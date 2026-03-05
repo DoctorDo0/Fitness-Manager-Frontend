@@ -37,7 +37,14 @@
       </el-form-item>
 
       <el-form-item label="课时:" prop="coursePeriod">
-        <el-input v-model="searchModel.courseInfo.coursePeriod" placeholder="输入课时"/>
+        <el-select v-model="searchModel.courseInfo.coursePeriod" placeholder="选择课时" style="width: 240px">
+          <el-option
+              v-for="item in coursePeriodOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+          />
+        </el-select>
       </el-form-item>
 
       <el-form-item label="课程地点:" prop="courseAddress">
@@ -99,14 +106,23 @@
   </div>
 
   <!--新增或修改的窗口-->
-  <el-dialog v-model="showDlg" :title="dlgTitle" width="700"
+  <el-dialog v-model="showDlg" :title="dlgTitle" width="800"
              :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg">
-    <el-form label-width="100" label-position="right" :model="courseInfoModel" ref="courseFormRef" :rules="rules">
+    <el-form label-width="120" label-position="right" :model="appointmentModel" ref="courseFormRef" :rules="rules">
       <el-row :gutter="20">
         <el-col :span="12">
 
           <el-form-item label="课程信息ID：" prop="courseInfoId">
-            <el-input v-model="courseInfoModel.courseInfoId" placeholder="请输入课程信息ID"/>
+            <el-select v-model="appointmentModel.courseInfoId" placeholder="请输入课程信息ID" value-key="id"
+                       filterable clearable>
+              <el-option
+                  v-for="item in courseInfoMainInfoOptions"
+                  :key="item.id"
+                  :label="item.courseId+' -- '+item.courseName+' || '+item.teacherId+' -- '+item.teacherName"
+                  :value="item.id"
+              >
+              </el-option>
+            </el-select>
           </el-form-item>
 
         </el-col>
@@ -114,7 +130,16 @@
         <el-col :span="12">
 
           <el-form-item label="学生ID：" prop="studentId">
-            <el-input v-model="courseInfoModel.studentId" placeholder="请输入学生ID"/>
+            <el-select v-model="appointmentModel.studentId" placeholder="请输入学生ID" value-key="id"
+                       filterable clearable>
+              <el-option
+                  v-for="item in studentMainInfoOptions"
+                  :key="item.id"
+                  :label="item.studentId+' -- '+item.name"
+                  :value="item.id"
+              >
+              </el-option>
+            </el-select>
           </el-form-item>
 
         </el-col>
@@ -167,7 +192,9 @@ import {
   findAll,
   deleteByIds as apiDeleteByIds,
   save,
-  update
+  update,
+  getStudentMainInfo,
+  getCourseInfoMainInfo
 } from "@/api/AppointmentApi.js";
 import {
   CirclePlus,
@@ -190,10 +217,36 @@ const pageinfo = reactive({
   total: 0,
 });
 
+//新增的课程与教师下拉列表(选择器)
+const studentMainInfoOptions = ref();
+const courseInfoMainInfoOptions = ref();
+
 //页面就绪后执行
 onMounted(() => {
   search(pageinfo.currentPageNo, pageinfo.currentPageSize);
+  setStudentMainInfoOptions();
+  setCourseInfoMainInfoOptions();
 });
+
+async function setStudentMainInfoOptions() {
+  let resp = await getStudentMainInfo();
+  studentMainInfoOptions.value = resp.data.map(item => ({
+    id: item.id,
+    studentId: item.studentId,
+    name: item.name
+  }));
+}
+
+async function setCourseInfoMainInfoOptions() {
+  let resp = await getCourseInfoMainInfo();
+  courseInfoMainInfoOptions.value = resp.data.map(item => ({
+    id: item.id,
+    teacherId: item.teacher.teacherId,
+    teacherName: item.teacher.name,
+    courseId: item.course.courseId,
+    courseName: item.course.courseName
+  }));
+}
 
 //TODO:
 //封装的查询表单
@@ -230,6 +283,30 @@ let searchModel = ref({
     }
   }
 });
+
+//查询与新增的课时下拉列表(选择器)
+const coursePeriodOptions = [
+  {
+    value: '',
+    label: '任意不限',
+  },
+  {
+    value: '1',
+    label: '1',
+  },
+  {
+    value: '2',
+    label: '2',
+  },
+  {
+    value: '3',
+    label: '3',
+  },
+  {
+    value: '4',
+    label: '4',
+  },
+]
 
 //封装查询功能，含更新数据
 async function search(pageNo = pageinfo.pageNo, pageSize = pageinfo.pageSize, params = {}) {
@@ -324,7 +401,7 @@ const dlgTitle = ref();
 //封装的新增表单
 
 //新增表单数据模型
-const courseInfoModel = ref({
+const appointmentModel = ref({
   id: null,
   studentId: null,
   courseInfoId: null,
@@ -360,27 +437,27 @@ const courseInfoModel = ref({
 //封装的界面刷新重置功能
 
 function setInitialFormData() {
-  courseInfoModel.value.id = null;
-  courseInfoModel.value.studentId = null;
-  courseInfoModel.value.courseInfoId = null;
-  courseInfoModel.value.student.id = null;
-  courseInfoModel.value.student.teacherId = null;
-  courseInfoModel.value.student.name = null;
-  courseInfoModel.value.student.gender = null;
-  courseInfoModel.value.courseInfo.id = null;
-  courseInfoModel.value.courseInfo.courseId = null;
-  courseInfoModel.value.courseInfo.teacherId = null;
-  courseInfoModel.value.courseInfo.courseDate = null;
-  courseInfoModel.value.courseInfo.coursePeriod = null;
-  courseInfoModel.value.courseInfo.courseAddress = null;
-  courseInfoModel.value.courseInfo.course.id = null;
-  courseInfoModel.value.courseInfo.course.courseId = null;
-  courseInfoModel.value.courseInfo.course.courseName = null;
-  courseInfoModel.value.courseInfo.course.description = null;
-  courseInfoModel.value.courseInfo.teacher.id = null;
-  courseInfoModel.value.courseInfo.teacher.teacherId = null;
-  courseInfoModel.value.courseInfo.teacher.name = null;
-  courseInfoModel.value.courseInfo.teacher.gender = null;
+  appointmentModel.value.id = null;
+  appointmentModel.value.studentId = null;
+  appointmentModel.value.courseInfoId = null;
+  appointmentModel.value.student.id = null;
+  appointmentModel.value.student.teacherId = null;
+  appointmentModel.value.student.name = null;
+  appointmentModel.value.student.gender = null;
+  appointmentModel.value.courseInfo.id = null;
+  appointmentModel.value.courseInfo.courseId = null;
+  appointmentModel.value.courseInfo.teacherId = null;
+  appointmentModel.value.courseInfo.courseDate = null;
+  appointmentModel.value.courseInfo.coursePeriod = null;
+  appointmentModel.value.courseInfo.courseAddress = null;
+  appointmentModel.value.courseInfo.course.id = null;
+  appointmentModel.value.courseInfo.course.courseId = null;
+  appointmentModel.value.courseInfo.course.courseName = null;
+  appointmentModel.value.courseInfo.course.description = null;
+  appointmentModel.value.courseInfo.teacher.id = null;
+  appointmentModel.value.courseInfo.teacher.teacherId = null;
+  appointmentModel.value.courseInfo.teacher.name = null;
+  appointmentModel.value.courseInfo.teacher.gender = null;
 }
 
 //新增/修改表单对象
@@ -418,7 +495,7 @@ function doEdit() {
       row = cloneDeep(row);//克隆出的新对象没有响应式能力
       row.password = null;
 
-      courseInfoModel.value = row;
+      appointmentModel.value = row;
       dlgTitle.value = "修改课程";
       showDlg.value = true;
     });
@@ -432,7 +509,7 @@ function rowEdit(row) {
     row = cloneDeep(row);//克隆出的新对象没有响应式能力
     row.password = null;
 
-    courseInfoModel.value = row;
+    appointmentModel.value = row;
     dlgTitle.value = "修改课程";
     showDlg.value = true;
   });
@@ -443,7 +520,7 @@ function doSubmit() {
   console.log("submit");
   courseFormRef.value.validate(async valid => {
     if (valid) {
-      let params = toRaw(courseInfoModel.value);
+      let params = toRaw(appointmentModel.value);
       if (mode.value === "add") {
         let resp = await save(params);
         if (resp.success) {

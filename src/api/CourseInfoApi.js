@@ -36,4 +36,18 @@ function update(teacher) {
     });
 }
 
-export {findAll, deleteByIds, save, update}
+function getCourseMainInfo() {
+    return api({
+        url: "/course/mainInfo",
+        method: "get"
+    });
+}
+
+function getTeacherMainInfo() {
+    return api({
+        url: "/teacher/mainInfo",
+        method: "get"
+    });
+}
+
+export {findAll, deleteByIds, save, update, getCourseMainInfo, getTeacherMainInfo}
