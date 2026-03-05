@@ -22,6 +22,8 @@
         <el-date-picker
             v-model="searchModel.courseDate"
             type="date"
+            value-format="YYYY-MM-DD"
+            format="YYYY-MM-DD"
             placeholder="输入课程日期"
         />
       </el-form-item>
@@ -115,8 +117,8 @@
           </el-form-item>
 
           <el-form-item label="课程日期：" prop="courseDate">
-            <el-date-picker v-model="courseInfoModel.courseDate" type="date" placeholder="请输入课程日期"
-                            style="width: 100%"/>
+            <el-date-picker v-model="courseInfoModel.courseDate" type="date" value-format="YYYY-MM-DD"
+                            format="YYYY-MM-DD" placeholder="请输入课程日期" style="width: 100%"/>
           </el-form-item>
           <el-form-item label="课程地点：" prop="courseAddress">
             <el-input v-model="courseInfoModel.courseAddress" placeholder="请输入课程地点"/>

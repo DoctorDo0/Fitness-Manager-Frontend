@@ -62,6 +62,11 @@
       <el-button type="primary" :icon="Search" @click="doSearch">查询</el-button>
       <el-button type="primary" :icon="Refresh" @click="resetForm">重置</el-button>
       <el-button type="danger" :icon="Delete" @click="doDelete">删除</el-button>
+      <el-button type="info" :icon="InfoFilled" @click="cancelAppointment">取消预约</el-button>
+      <el-button type="success" :icon="CircleCheckFilled" @click="attendStatus">设置签到</el-button>
+      <el-button type="danger" :icon="CircleCloseFilled" @click="absentStatus">设置旷课</el-button>
+      <el-button type="warning" :icon="WarningFilled" @click="lateStatus">设置迟到</el-button>
+      <el-button type="primary" :icon="QuestionFilled" @click="leaveStatus">设置请假</el-button>
     </div>
   </div>
 
@@ -80,6 +85,8 @@
       <el-table-column prop="courseInfo.coursePeriod" label="课时" width="60"/>
       <el-table-column prop="courseInfo.courseAddress" label="课程地点" width="100"/>
       <el-table-column prop="courseInfo.course.description" label="课程描述" width="140" align="center"/>
+      <el-table-column prop="recordInfo" label="签到状态" width="80" align="center"/>
+      <el-table-column prop="recordTime" label="签到时间" width="120" align="center"/>
       <el-table-column prop="courseInfo.id" label="课程信息ID" width="60"/>
       <el-table-column prop="student.id" label="学生ID" width="60"/>
       <el-table-column prop="courseInfo.course.id" label="课程ID" width="60"/>
@@ -190,21 +197,31 @@
 </style>
 
 <script setup>
-import {ref, onMounted, reactive, toRaw, nextTick} from "vue";
+import {nextTick, onMounted, reactive, ref, toRaw} from "vue";
 import {
-  findAll,
+  cancelAppointmentByIds,
   deleteByIds as apiDeleteByIds,
-  save,
-  update,
+  findAll,
+  getCourseInfoMainInfo,
   getStudentMainInfo,
-  getCourseInfoMainInfo
+  save,
+  setAbsentStatusByIds,
+  setAttendStatusByIds,
+  setLateStatusByIds,
+  setLeaveStatusByIds,
+  update
 } from "@/api/AppointmentApi.js";
 import {
+  CircleCheckFilled,
+  CircleCloseFilled,
   CirclePlus,
   Delete,
   Edit,
+  InfoFilled,
+  QuestionFilled,
   Refresh,
   Search,
+  WarningFilled,
 } from "@element-plus/icons-vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 //深度克隆
@@ -520,7 +537,6 @@ function rowEdit(row) {
 
 //提交课程表单
 function doSubmit() {
-  console.log("submit");
   courseFormRef.value.validate(async valid => {
     if (valid) {
       let params = toRaw(appointmentModel.value);
@@ -552,6 +568,146 @@ function closeDlg() {
   courseFormRef.value.resetFields();
   //TODO:
   setInitialFormData();//bug fixed: 用于修复，当第一次进入界面后，先点击编辑后，再点击新增，导致新增界面回显为第一次点击编辑的数据的bug
+}
+
+//多行取消预约功能
+function cancelAppointment() {
+  //获取选中行
+  let rows = tbl.value.getSelectionRows();
+  let ids = rows.map(t => t.id);
+  if (ids.length === 0) {
+    ElMessage.error("未选择要操作的行");
+    return;
+  }
+  ElMessageBox.confirm("是否确认取消预约所选中的行?", "警告", {
+    type: "warning"
+  }).then(async () => {
+    //点击ok操作
+    let resp = await cancelAppointmentByIds(ids);
+    if (resp.success) {
+      ElMessage.success("取消预约课程成功");
+      showDlg.value = false;
+      doSearch();
+    } else {
+      ElMessage.error(resp.message || "取消预约课程失败");
+    }
+    doSearch();
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
+}
+
+//多行设置签到功能
+function attendStatus() {
+  //获取选中行
+  let rows = tbl.value.getSelectionRows();
+  let ids = rows.map(t => t.id);
+  if (ids.length === 0) {
+    ElMessage.error("未选择要操作的行");
+    return;
+  }
+  ElMessageBox.confirm("是否确认设置签到所选中的行?", "警告", {
+    type: "warning"
+  }).then(async () => {
+    //点击ok操作
+    let resp = await setAttendStatusByIds(ids);
+    if (resp.success) {
+      ElMessage.success("设置签到成功");
+      showDlg.value = false;
+      doSearch();
+    } else {
+      ElMessage.error(resp.message || "设置签到失败");
+    }
+    doSearch();
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
+}
+
+//多行设置旷课功能
+function absentStatus() {
+  //获取选中行
+  let rows = tbl.value.getSelectionRows();
+  let ids = rows.map(t => t.id);
+  if (ids.length === 0) {
+    ElMessage.error("未选择要操作的行");
+    return;
+  }
+  ElMessageBox.confirm("是否确认设置旷课所选中的行?", "警告", {
+    type: "warning"
+  }).then(async () => {
+    //点击ok操作
+    let resp = await setAbsentStatusByIds(ids);
+    if (resp.success) {
+      ElMessage.success("设置旷课成功");
+      showDlg.value = false;
+      doSearch();
+    } else {
+      ElMessage.error(resp.message || "设置旷课失败");
+    }
+    doSearch();
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
+}
+
+//多行设置迟到功能
+function lateStatus() {
+  //获取选中行
+  let rows = tbl.value.getSelectionRows();
+  let ids = rows.map(t => t.id);
+  if (ids.length === 0) {
+    ElMessage.error("未选择要操作的行");
+    return;
+  }
+  ElMessageBox.confirm("是否确认设置迟到所选中的行?", "警告", {
+    type: "warning"
+  }).then(async () => {
+    //点击ok操作
+    let resp = await setLateStatusByIds(ids);
+    if (resp.success) {
+      ElMessage.success("设置迟到成功");
+      showDlg.value = false;
+      doSearch();
+    } else {
+      ElMessage.error(resp.message || "设置迟到失败");
+    }
+    doSearch();
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
+}
+
+//多行设置请假功能
+function leaveStatus() {
+  //获取选中行
+  let rows = tbl.value.getSelectionRows();
+  let ids = rows.map(t => t.id);
+  if (ids.length === 0) {
+    ElMessage.error("未选择要操作的行");
+    return;
+  }
+  ElMessageBox.confirm("是否确认设置请假所选中的行?", "警告", {
+    type: "warning"
+  }).then(async () => {
+    //点击ok操作
+    let resp = await setLeaveStatusByIds(ids);
+    if (resp.success) {
+      ElMessage.success("设置请假成功");
+      showDlg.value = false;
+      doSearch();
+    } else {
+      ElMessage.error(resp.message || "设置请假失败");
+    }
+    doSearch();
+  }).catch(() => {
+    //点击cancel操作
+    ElMessage.info("已取消")
+  });
 }
 
 //表格对象

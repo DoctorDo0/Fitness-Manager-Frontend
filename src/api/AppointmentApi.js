@@ -50,4 +50,56 @@ function getCourseInfoMainInfo() {
     });
 }
 
-export {findAll, deleteByIds, save, update, getStudentMainInfo, getCourseInfoMainInfo}
+function cancelAppointmentByIds(ids) {
+    return api({
+        url: "/appointment/cancel",
+        method: "put",
+        data: ids
+    });
+}
+
+function setAttendStatusByIds(ids) {
+    return api({
+        url: "/appointment/attend",
+        method: "put",
+        data: ids
+    });
+}
+
+function setAbsentStatusByIds(ids) {
+    return api({
+        url: "/appointment/absent",
+        method: "put",
+        data: ids
+    });
+}
+
+function setLateStatusByIds(ids) {
+    return api({
+        url: "/appointment/late",
+        method: "put",
+        data: ids
+    });
+}
+
+function setLeaveStatusByIds(ids) {
+    return api({
+        url: "/appointment/leave",
+        method: "put",
+        data: ids
+    });
+}
+
+export {
+    findAll,
+    deleteByIds,
+    save,
+    update,
+    getStudentMainInfo,
+    getCourseInfoMainInfo,
+    cancelAppointmentByIds,
+    setAttendStatusByIds,
+    setAbsentStatusByIds,
+    setLateStatusByIds,
+    setLeaveStatusByIds
+}
