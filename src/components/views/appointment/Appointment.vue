@@ -80,6 +80,9 @@
       <el-table-column prop="courseInfo.coursePeriod" label="课时" width="60"/>
       <el-table-column prop="courseInfo.courseAddress" label="课程地点" width="100"/>
       <el-table-column prop="courseInfo.course.description" label="课程描述" width="140" align="center"/>
+      <el-table-column prop="courseInfo.id" label="课程信息ID" width="60"/>
+      <el-table-column prop="student.id" label="学生ID" width="60"/>
+      <el-table-column prop="courseInfo.course.id" label="课程ID" width="60"/>
       <el-table-column prop="courseInfo.course.id" label="课程ID" width="60"/>
       <el-table-column prop="courseInfo.teacher.id" label="教师ID" width="60"/>
       <el-table-column width="150" label="操作">
