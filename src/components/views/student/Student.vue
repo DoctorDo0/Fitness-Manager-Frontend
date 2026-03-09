@@ -467,7 +467,7 @@ const studentFormRef = ref();
 const rules = {
   studentId: [
     {required: true, message: "ID不可为空", trigger: "blur"},
-    {min: 6, max: 12, message: "ID必须介于6~12位", trigger: "blur"}
+    {min: 5, max: 12, message: "ID必须介于5~12位", trigger: "blur"}
   ],
   studentPassword: [
     {validator: validateFormPass, trigger: "blur"}

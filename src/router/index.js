@@ -9,6 +9,10 @@ const routes = [
         component: () => import("@/components/views/Main.vue"),
         children: [
             {
+                name: "main-template",
+                path: "/main/template",
+                component: () => import("@/components/views/data/Template.vue")
+            }, {
                 name: "main-data",
                 path: "/main/data",
                 component: () => import("@/components/views/data/Data.vue")
@@ -69,6 +73,10 @@ const routes = [
     },
     //==========
     {
+        name: "template",
+        path: "/template",
+        component: () => import("@/components/views/data/Template.vue")
+    }, {
         name: "data",
         path: "/data",
         component: () => import("@/components/views/data/Data.vue")

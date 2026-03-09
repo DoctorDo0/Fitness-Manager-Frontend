@@ -65,9 +65,7 @@
             <div class="card-header">
               <span>教师教授课程占比</span>
               <el-button type="primary" link @click="refreshTeacherData">
-                <el-icon>
-                  <Refresh/>
-                </el-icon>
+                <el-icon><Refresh /></el-icon>
               </el-button>
             </div>
           </template>
@@ -87,9 +85,7 @@
             <div class="card-header">
               <span>学生选课占比</span>
               <el-button type="primary" link @click="refreshStudentData">
-                <el-icon>
-                  <Refresh/>
-                </el-icon>
+                <el-icon><Refresh /></el-icon>
               </el-button>
             </div>
           </template>
@@ -106,85 +102,12 @@
   </div>
 </template>
 
-<style scoped>
-.dashboard {
-  padding: 20px;
-  background-color: #f5f7fa;
-  min-height: 100vh;
-}
-
-.top-cards {
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  height: 220px;
-}
-
-.stat-card :deep(.el-card__body) {
-  padding: 0;
-  height: calc(100% - 60px);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.chart-wrapper {
-  width: 100%;
-  height: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.mini-chart {
-  width: 100%;
-  height: 100%;
-}
-
-.chart-card {
-  height: 400px;
-}
-
-.chart-card :deep(.el-card__body) {
-  padding: 0;
-  height: calc(100% - 60px);
-}
-
-.big-chart-wrapper {
-  width: 100%;
-  height: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.big-chart {
-  width: 100%;
-  height: 100%;
-}
-
-/* 响应式调整 */
-@media (max-width: 1200px) {
-  .stat-card {
-    height: 200px;
-  }
-
-  .chart-card {
-    height: 350px;
-  }
-}
-</style>
-
 <script setup>
-import {ref, onMounted} from 'vue'
-import {Refresh} from '@element-plus/icons-vue'
-import {use} from 'echarts/core'
-import {CanvasRenderer} from 'echarts/renderers'
-import {PieChart} from 'echarts/charts'
+import { ref, onMounted } from 'vue'
+import { Refresh } from '@element-plus/icons-vue'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { PieChart } from 'echarts/charts'
 import {
   TitleComponent,
   TooltipComponent,
@@ -192,13 +115,6 @@ import {
   GridComponent
 } from 'echarts/components'
 import VChart from 'vue-echarts'
-import {
-  getCourseGroupWithStudent,
-  getCourseGroupWithTeacher,
-  getCourseNumber,
-  getStudentNumber,
-  getTeacherNumber
-} from "@/api/DataApi.js";
 
 // 按需引入 ECharts 组件
 use([
@@ -401,7 +317,7 @@ const studentCourseOption = ref({
 
 // ============ 数据初始化方法 ============
 
-/*// 设置假数据
+// 设置假数据
 const setMockData = () => {
   // 顶部卡片总数
   studentCount.value = 528
@@ -410,38 +326,38 @@ const setMockData = () => {
 
   // 顶部小饼图数据
   studentChartOption.value.series[0].data = [
-    {name: '本科生', value: 385},
-    {name: '研究生', value: 112},
-    {name: '博士生', value: 31}
+    { name: '本科生', value: 385 },
+    { name: '研究生', value: 112 },
+    { name: '博士生', value: 31 }
   ]
 
   teacherChartOption.value.series[0].data = [
-    {name: '教授', value: 18},
-    {name: '副教授', value: 15},
-    {name: '讲师', value: 9}
+    { name: '教授', value: 18 },
+    { name: '副教授', value: 15 },
+    { name: '讲师', value: 9 }
   ]
 
   courseChartOption.value.series[0].data = [
-    {name: '专业课', value: 22},
-    {name: '选修课', value: 10},
-    {name: '必修课', value: 4}
+    { name: '专业课', value: 22 },
+    { name: '选修课', value: 10 },
+    { name: '必修课', value: 4 }
   ]
 
   // 底部大饼图数据
   teacherCourseOption.value.series[0].data = [
-    {name: '张教授 (Java)', value: 3},
-    {name: '李教授 (Python)', value: 2},
-    {name: '王教授 (数据库)', value: 4},
-    {name: '赵教授 (前端)', value: 2},
-    {name: '其他教师', value: 5}
+    { name: '张教授 (Java)', value: 3 },
+    { name: '李教授 (Python)', value: 2 },
+    { name: '王教授 (数据库)', value: 4 },
+    { name: '赵教授 (前端)', value: 2 },
+    { name: '其他教师', value: 5 }
   ]
 
   studentCourseOption.value.series[0].data = [
-    {name: 'Java程序设计', value: 156},
-    {name: 'Python数据分析', value: 124},
-    {name: 'MySQL数据库', value: 98},
-    {name: 'Vue前端开发', value: 87},
-    {name: '其他课程', value: 63}
+    { name: 'Java程序设计', value: 156 },
+    { name: 'Python数据分析', value: 124 },
+    { name: 'MySQL数据库', value: 98 },
+    { name: 'Vue前端开发', value: 87 },
+    { name: '其他课程', value: 63 }
   ]
 }
 
@@ -461,7 +377,7 @@ const refreshTeacherData = () => {
     // 避免重复
     const name = `${teacher} (${course})`
     if (!newData.some(item => item.name === name)) {
-      newData.push({name, value})
+      newData.push({ name, value })
     }
   }
 
@@ -484,73 +400,88 @@ const refreshStudentData = () => {
 
     // 避免重复
     if (!newData.some(item => item.name === course)) {
-      newData.push({name: course, value})
+      newData.push({ name: course, value })
     }
   }
 
   studentCourseOption.value.series[0].data = newData
-}*/
-
-// 刷新教师数据
-const refreshTeacherData = async () => {
-  let courseGroupWithTeacher = await getCourseGroupWithTeacher();
-
-  teacherCourseOption.value.series[0].data = courseGroupWithTeacher.data.map(item => ({
-    name: `${item.name}`,
-    value: item.count
-  }))
-}
-
-// 刷新学生数据
-const refreshStudentData = async () => {
-  let courseGroupWithStudent = await getCourseGroupWithStudent();
-
-  studentCourseOption.value.series[0].data = courseGroupWithStudent.data.map(item => ({
-    name: `${item.name}`,
-    value: item.count
-  }))
-}
-
-async function loadData() {
-  //不使用temp则会得到正在执行函数的promise
-  let student = await getStudentNumber();
-  let teacher = await getTeacherNumber();
-  let course = await getCourseNumber();
-  let courseGroupWithTeacher = await getCourseGroupWithTeacher();
-  let courseGroupWithStudent = await getCourseGroupWithStudent();
-
-  // 顶部卡片总数
-  studentCount.value = student.data;
-  teacherCount.value = teacher.data;
-  courseCount.value = course.data;
-
-  // 顶部小饼图数据
-  studentChartOption.value.series[0].data = [
-    {name: '学生', value: student.data}
-  ]
-
-  teacherChartOption.value.series[0].data = [
-    {name: '教师', value: teacher.data}
-  ]
-
-  courseChartOption.value.series[0].data = [
-    {name: '课程', value: course.data}
-  ]
-
-  teacherCourseOption.value.series[0].data = courseGroupWithTeacher.data.map(item => ({
-    name: `${item.name}`,
-    value: item.count
-  }))
-
-  studentCourseOption.value.series[0].data = courseGroupWithStudent.data.map(item => ({
-    name: `${item.name}`,
-    value: item.count
-  }))
 }
 
 // 组件挂载时初始化数据
 onMounted(() => {
-  // setMockData();
-  loadData();
+  setMockData()
 })
 </script>
+
+<style scoped>
+.dashboard {
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+.top-cards {
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  height: 220px;
+}
+
+.stat-card :deep(.el-card__body) {
+  padding: 0;
+  height: calc(100% - 60px);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.chart-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.mini-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-card {
+  height: 400px;
+}
+
+.chart-card :deep(.el-card__body) {
+  padding: 0;
+  height: calc(100% - 60px);
+}
+
+.big-chart-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.big-chart {
+  width: 100%;
+  height: 100%;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .stat-card {
+    height: 200px;
+  }
+
+  .chart-card {
+    height: 350px;
+  }
+}
+</style>

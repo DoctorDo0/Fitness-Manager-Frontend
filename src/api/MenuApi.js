@@ -1,5 +1,8 @@
 const menus = [
     {
+        name: "数据统计(模板)",
+        url: "/main/template"
+    }, {
         name: "数据统计",
         url: "/main/data"
     }, {
@@ -17,7 +20,7 @@ const menus = [
             name: "课程信息管理",
             url: "/main/course-info"
         }, {
-            name: "预约管理",
+            name: "学生选课管理",
             url: "/main/appointment"
         }]
     }, {

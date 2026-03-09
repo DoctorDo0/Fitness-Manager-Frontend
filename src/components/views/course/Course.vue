@@ -67,6 +67,7 @@
       <el-table-column prop="id" label="ID" width="80" fixed/>
       <el-table-column prop="courseId" label="课程代码" width="100" fixed/>
       <el-table-column prop="courseName" label="课程名称" width="140" fixed/>
+      <el-table-column prop="credits" label="课程学分" width="100"/>
       <el-table-column prop="description" label="课程描述" width="120" align="center"/>
       <el-table-column prop="registerDate" label="注册起始日期" width="160" align="center"/>
       <el-table-column prop="registerBy" label="注册操作人" width="120" align="center"/>
@@ -106,6 +107,10 @@
           <el-form-item label="课程代码：" prop="courseId">
             <el-input v-model="courseModel.courseId" placeholder="请输入课程代码" :readonly="mode.valueOf() ==='edit'"
                       :disabled="mode.valueOf() ==='edit'"/>
+          </el-form-item>
+
+          <el-form-item label="课程学分：" prop="credits">
+            <el-input v-model="courseModel.credits" placeholder="请输入课程学分"/>
           </el-form-item>
 
         </el-col>
@@ -293,6 +298,7 @@ const courseModel = ref({
   id: null,
   courseId: null,
   courseName: null,
+  credits: null,
   description: null,
   active: null
 });
@@ -309,6 +315,10 @@ const rules = {
   courseName: [
     {required: true, message: "课程名称不可为空", trigger: "blur"},
     {min: 2, max: 20, message: "课程名称必须介于2~20位", trigger: "blur"}
+  ],
+  credits: [
+    {required: true, message: "课程学分不可为空", trigger: "blur"},
+    {type: 'number', message: '课程学分必须为数字', trigger: 'blur'}
   ]
 };
 

@@ -62,18 +62,33 @@
       <el-button type="primary" :icon="Search" @click="doSearch">查询</el-button>
       <el-button type="primary" :icon="Refresh" @click="resetForm">重置</el-button>
       <el-button type="danger" :icon="Delete" @click="doDelete">删除</el-button>
+    </div>
+  </div>
+
+  <!--第二行按钮区-->
+  <div class="action">
+    <div class="action-left-button">
       <el-button type="primary" :icon="CirclePlusFilled" @click="bookAppointment">预约</el-button>
       <el-button type="info" :icon="RemoveFilled" @click="cancelAppointment">取消预约</el-button>
+    </div>
+  </div>
+
+  <!--第三行按钮区-->
+  <div class="action">
+    <div class="action-left-button">
       <el-button type="success" :icon="CircleCheckFilled" @click="attendStatus">设置签到</el-button>
       <el-button type="danger" :icon="CircleCloseFilled" @click="absentStatus">设置旷课</el-button>
       <el-button type="warning" :icon="WarningFilled" @click="lateStatus">设置迟到</el-button>
       <el-button type="primary" :icon="QuestionFilled" @click="leaveStatus">设置请假</el-button>
+      <el-button type="info" :icon="Edit" @click="openRecord">设置签到备注</el-button>
+      <el-button type="primary" :icon="Finished" @click="openCredit">课程学生分数</el-button>
     </div>
   </div>
 
   <!-- 数据区 -->
   <div class="grid">
-    <el-table class="tbl" v-bind:data="courses" stripe border v-on:row-click="tableRowClick" height="500" ref="tbl">
+    <el-table class="tbl" v-bind:data="appointments" stripe border v-on:row-click="tableRowClick" height="500"
+              ref="tbl">
       <el-table-column type="selection" align="center" fixed/>
       <el-table-column prop="id" label="ID" width="80" fixed/>
       <el-table-column prop="courseInfo.course.courseId" label="课程代码" width="100" fixed/>
@@ -85,9 +100,14 @@
       <el-table-column prop="courseInfo.courseDate" label="课程日期" width="120"/>
       <el-table-column prop="courseInfo.coursePeriod" label="课时" width="60"/>
       <el-table-column prop="courseInfo.courseAddress" label="课程地点" width="100"/>
+      <el-table-column prop="courseInfo.currentNumberInfo" label="课程最大预约人数" width="100"/>
       <el-table-column prop="courseInfo.course.description" label="课程描述" width="140" align="center"/>
-      <el-table-column prop="recordInfo" label="签到状态" width="80" align="center"/>
+      <el-table-column prop="recordInfo" label="签到状态" width="100" align="center"/>
       <el-table-column prop="recordTime" label="签到时间" width="120" align="center"/>
+      <el-table-column prop="recordDesc" label="签到备注" width="140" align="center"/>
+      <el-table-column prop="courseInfo.course.credits" label="课程学分" width="100" align="center"/>
+      <el-table-column prop="score" label="课程分数" width="100" align="center"/>
+      <el-table-column prop="credit" label="所得学分" width="100" align="center"/>
       <el-table-column prop="courseInfo.id" label="课程信息ID" width="60"/>
       <el-table-column prop="student.id" label="学生ID" width="60"/>
       <el-table-column prop="courseInfo.course.id" label="课程ID" width="60"/>
@@ -166,6 +186,57 @@
     </template>
   </el-dialog>
 
+  <!--设置签到备注的窗口-->
+  <el-dialog v-model="showDlg_record" title="设置签到备注" width="800"
+             :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg_record" :rules="rules_record">
+    <el-form label-width="120" label-position="right" :model="appointmentModel_record"
+             ref="appointmentFormRef_record">
+      <el-row :gutter="20">
+        <el-col :span="24">
+
+          <el-form-item label="签到备注:" prop="recordDesc">
+            <el-input type="textarea" v-model="appointmentModel_record.recordDesc" placeholder="输入签到备注"
+                      input-style="height:100px"/>
+          </el-form-item>
+
+        </el-col>
+
+      </el-row>
+
+    </el-form>
+    <template #footer>
+      <div>
+        <el-button type="primary" @click="doSubmit_record">确定</el-button>
+        <el-button @click="showDlg_record=false">取消</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!--设置学生分数的窗口-->
+  <el-dialog v-model="showDlg_credit" title="设置学生分数" width="800"
+             :close-on-click-modal="false" draggable :overflow="false" @close="closeDlg_credit" :rules="rules_credit">
+    <el-form label-width="120" label-position="right" :model="appointmentModel_credit"
+             ref="appointmentFormRef_credit">
+      <el-row :gutter="20">
+        <el-col :span="12">
+
+          <el-form-item label="学生课程分数:" prop="score">
+            <el-input v-model="appointmentModel_credit.score" placeholder="输入学生分数"/>
+          </el-form-item>
+
+        </el-col>
+
+      </el-row>
+
+    </el-form>
+    <template #footer>
+      <div>
+        <el-button type="primary" @click="doSubmit_credit">确定</el-button>
+        <el-button @click="showDlg_credit=false">取消</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
 </template>
 
 <style scoped>
@@ -176,6 +247,7 @@
   /*padding: 16px;
   background-color: #f5f7fa;
   border-radius: 4px;*/
+  margin-bottom: 5px;
 }
 
 .action-left-button, .action-right-button {
@@ -209,8 +281,10 @@ import {
   save,
   setAbsentStatusByIds,
   setAttendStatusByIds,
+  setCreditScoreByIds,
   setLateStatusByIds,
   setLeaveStatusByIds,
+  setRecordDescByIds,
   update
 } from "@/api/AppointmentApi.js";
 import {
@@ -220,6 +294,7 @@ import {
   CirclePlusFilled,
   Delete,
   Edit,
+  Finished,
   QuestionFilled,
   Refresh,
   RemoveFilled,
@@ -231,7 +306,7 @@ import {ElMessage, ElMessageBox} from "element-plus";
 import {cloneDeep} from "lodash";
 
 //表格数据
-const courses = ref();
+const appointments = ref();
 
 //页面数据
 const pageinfo = reactive({
@@ -334,7 +409,7 @@ const coursePeriodOptions = [
 //封装查询功能，含更新数据
 async function search(pageNo = pageinfo.pageNo, pageSize = pageinfo.pageSize, params = {}) {
   let resp = await findAll(pageNo, pageSize, params);
-  courses.value = resp.data.list;
+  appointments.value = resp.data.list;
   pageinfo.currentPageNo = resp.data.pageNum;
   pageinfo.currentPageSize = resp.data.pageSize;
   pageinfo.total = resp.data.total;
@@ -727,6 +802,117 @@ function leaveStatus() {
     //点击cancel操作
     ElMessage.info("已取消")
   });
+}
+
+//是否显示对话框
+const showDlg_record = ref(false);
+
+//签到表单数据模型
+const appointmentModel_record = ref({
+  id: null,
+  /*record: null,*/
+  recordDesc: null
+});
+
+//签到表单对象
+const appointmentFormRef_record = ref();
+
+function openRecord() {
+  let rows = tbl.value.getSelectionRows();
+  if (rows.length === 0) {
+    ElMessage.warning("请选中要设置签到信息的行");
+  } else {
+    showDlg_record.value = true;
+  }
+}
+
+//校验规则
+const rules_record = {
+  /*  courseInfoId: [
+      {required: true, message: "课程信息ID不可为空", trigger: "blur"}
+    ],
+    studentId: [
+      {required: true, message: "学生ID不可为空", trigger: "blur"}
+    ]*/
+};
+
+//提交签到表单
+function doSubmit_record() {
+  let rows = tbl.value.getSelectionRows();
+  let ids = rows.map(t => t.id);
+  appointmentFormRef_record.value.validate(async valid => {
+    if (valid) {
+      let params = appointmentModel_record.value.recordDesc;
+      let resp = await setRecordDescByIds(ids, params);
+      if (resp.success) {
+        ElMessage.success("保存签到信息成功");
+        showDlg_record.value = false;
+        doSearch();
+      } else {
+        ElMessage.error(resp.message || "保存签到信息失败");
+      }
+    }
+  });
+}
+
+//关闭对话框时触发
+function closeDlg_record() {
+  appointmentFormRef_record.value.resetFields();
+}
+
+//是否显示对话框
+const showDlg_credit = ref(false);
+
+//学生课程分数表单数据模型
+const appointmentModel_credit = ref({
+  id: null,
+  score: null
+});
+
+//学生课程分数表单对象
+const appointmentFormRef_credit = ref();
+
+function openCredit() {
+  let rows = tbl.value.getSelectionRows();
+  if (rows.length === 0) {
+    ElMessage.warning("请选中要设置学生课程分数的行");
+  } else {
+    showDlg_credit.value = true;
+  }
+}
+
+//校验规则
+const rules_credit = {
+  /*  courseInfoId: [
+      {required: true, message: "课程信息ID不可为空", trigger: "blur"}
+    ],
+    studentId: [
+      {required: true, message: "学生ID不可为空", trigger: "blur"}
+    ]*/
+};
+
+//提交学生课程分数表单
+function doSubmit_credit() {
+  let rows = tbl.value.getSelectionRows();
+  let id = rows.map(t => t.id);
+  appointmentFormRef_credit.value.validate(async valid => {
+    if (valid) {
+      let params = appointmentModel_credit.value.score;
+      let resp = await setCreditScoreByIds(id, params);
+      if (resp.success) {
+        ElMessage.success("保存学生课程分数成功");
+        showDlg_credit.value = false;
+        doSearch();
+      } else {
+        ElMessage.error(resp.message || "保存学生课程分数失败");
+      }
+    }
+  });
+}
+
+//关闭对话框时触发
+function closeDlg_credit() {
+  appointmentFormRef_credit.value.resetFields();
 }
 
 //表格对象

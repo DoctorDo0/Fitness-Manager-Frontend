@@ -70,6 +70,8 @@
       <el-table-column prop="courseDate" label="课程日期" width="120"/>
       <el-table-column prop="coursePeriod" label="课时" width="60"/>
       <el-table-column prop="courseAddress" label="课程地点" width="100"/>
+      <el-table-column prop="course.credits" label="课程学分" width="100"/>
+      <el-table-column prop="maxNumber" label="课程可选最大人数" width="100"/>
       <el-table-column prop="course.description" label="课程描述" width="140" align="center"/>
       <el-table-column prop="course.id" label="课程ID" width="60"/>
       <el-table-column prop="teacher.id" label="教师ID" width="60"/>
@@ -243,7 +245,8 @@ async function setCourseMainInfoOptions() {
   courseMainInfoOptions.value = resp.data.map(item => ({
     id: item.id,
     courseId: item.courseId,
-    courseName: item.courseName
+    courseName: item.courseName,
+    credits: item.credits
   }));
 }
 
@@ -267,6 +270,7 @@ let searchModel = ref({
     id: null,
     courseId: null,
     courseName: null,
+    credits: null,
     description: null
   },
   teacher: {
@@ -390,6 +394,7 @@ const courseInfoModel = ref({
     id: null,
     courseId: null,
     courseName: null,
+    credits: null,
     description: null
   },
   teacher: {
@@ -409,6 +414,7 @@ function setInitialFormData() {
   courseInfoModel.value.course.id = null;
   courseInfoModel.value.course.courseId = null;
   courseInfoModel.value.course.courseName = null;
+  courseInfoModel.value.course.credits = null;
   courseInfoModel.value.course.description = null;
   courseInfoModel.value.teacher.id = null;
   courseInfoModel.value.teacher.teacherId = null;

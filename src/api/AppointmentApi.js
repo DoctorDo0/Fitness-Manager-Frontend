@@ -98,6 +98,22 @@ function setLeaveStatusByIds(ids) {
     });
 }
 
+function setRecordDescByIds(ids, desc) {
+    return api({
+        url: "/appointment/recordDesc",
+        method: "put",
+        data: {ids, desc}
+    });
+}
+
+function setCreditScoreByIds(ids, score) {
+    return api({
+        url: "/appointment/credit",
+        method: "put",
+        data: {ids, score}
+    });
+}
+
 export {
     findAll,
     deleteByIds,
@@ -110,5 +126,7 @@ export {
     setAttendStatusByIds,
     setAbsentStatusByIds,
     setLateStatusByIds,
-    setLeaveStatusByIds
+    setLeaveStatusByIds,
+    setRecordDescByIds,
+    setCreditScoreByIds
 }
